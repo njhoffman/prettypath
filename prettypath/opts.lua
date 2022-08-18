@@ -16,14 +16,15 @@ local opts = {
     path_dir  = '#556789',
     path_name = '#4489bb',
   },
-  format       = "%score% %icon% %dir%%name%",
+  -- format       = "%score% %icon% %dir%%name%",
+  format       = "%path% %icon% %dir%%name%",
   -- format       = "%path% %icon% %dir%%name%",
   stat_file    = true,
   home_name    = "~",
   -- 0 (false) - 100 (true)
   color_icon   = true,
   color_name   = false,
-  output_stats = true
+  output_stats = false
 }
 
 for _, command_arg in ipairs(arg) do

@@ -1,14 +1,3 @@
-apm.csv
-apps.env
-cpbooster-config.json
-filebot.psm
-monero-wallet-cli.log
-nohup.out
-snippets.json
-test.lua
-unicode_table.txt
-./unicode_table.txt
-./files/unicode_table.txt
-/home/nicholas/files/unicode_table.txt
-/home/poopers/files/unicode_table.txt
 /home/nicholas/.profile
+/home/nicholas/.zpath
+/home/nicholas/bin/backlight.sh

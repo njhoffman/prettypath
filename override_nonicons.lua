@@ -1,15 +1,10 @@
-local icons = {
-  ["mp3"] = {
-    icon = " ",
-    color = "#404bad",
-    name = "mp3",
-  },
-  ["pgsql"] = {
-    icon = "",
-    color = "#dad8d8",
-    name = "Sql",
-  },
+local nonicons = require("nonicons")
 
+local function get(name)
+  return nonicons[name]
+end
+
+local icons = {
   -- ["gruntfile"] = {
   --   icon = "",
   --   color = "#e37933",
@@ -65,6 +60,11 @@ local icons = {
   --   color = "#a074c4",
   --   name = "Procfile"
   -- },
+  ["svg"] = {
+    icon = get("image"),
+    color = "#FFB13B",
+    name = "Svg"
+  },
   -- [".bashprofile"] = {
   --   icon = "",
   --   color = "#89e051",
@@ -85,6 +85,26 @@ local icons = {
   --   color = "#41535b",
   --   name = "DsStore"
   -- },
+  ["git"] = {
+    icon = get("git-commit"),
+    color = "#F14C28",
+    name = "GitLogo"
+  },
+  [".gitattributes"] = {
+    icon = get("git-commit"),
+    color = "#41535b",
+    name = "GitAttributes"
+  },
+  [".gitconfig"] = {
+    icon = get("git-commit"),
+    color = "#41535b",
+    name = "GitConfig"
+  },
+  [".gitignore"] = {
+    icon = get("git-commit"),
+    color = "#41535b",
+    name = "GitIgnore"
+  },
   -- ["COMMIT_EDITMSG"] = {
   --   icon = "",
   --   color = "#41535b",
@@ -95,6 +115,41 @@ local icons = {
   --   color = "#e24329",
   --   name = "GitlabCI"
   -- },
+  [".gvimrc"] = {
+    icon = get("vim"),
+    color = "#019833",
+    name = "Gvimrc"
+  },
+  [".npmignore"] = {
+    icon = get("npm"),
+    color = "#E8274B",
+    name = "NPMIgnore"
+  },
+  [".vimrc"] = {
+    icon = get("vim"),
+    color = "#019833",
+    name = "Vimrc"
+  },
+  [".zshrc"] = {
+    icon = get("terminal"),
+    color = "#89e051",
+    name = "Zshrc"
+  },
+  ["Dockerfile"] = {
+    icon = get("docker"),
+    color = "#384d54",
+    name = "Dockerfile"
+  },
+  ["Gemfile$"] = {
+    icon = get("ruby"),
+    color = "#701516",
+    name = "Gemfile"
+  },
+  ["LICENSE"] = {
+    icon = get("file-badge"),
+    color = "#d0bf41",
+    name = "License"
+  },
   -- ["Vagrantfile$"] = {
   --   icon = "",
   --   color = "#1563FF",
@@ -120,6 +175,11 @@ local icons = {
   --   color = "#4d5a5e",
   --   name = "Awk"
   -- },
+  ["bash"] = {
+    icon = get("terminal"),
+    color = "#89e051",
+    name = "Bash"
+  },
   -- ["bat"] = {
   --   icon = "",
   --   color = "#C1F12E",
@@ -130,6 +190,21 @@ local icons = {
   --   color = "#a074c4",
   --   name = "Bmp"
   -- },
+  ["c"] = {
+    icon = get("c"),
+    color = "#599eff",
+    name = "C"
+  },
+  ["c++"] = {
+    icon = get("c-plusplus"),
+    color = "#f34b7d",
+    name = "CPlusPlus"
+  },
+  ["cc"] = {
+    icon = get("c-plusplus"),
+    color = "#f34b7d",
+    name = "CPlusPlus"
+  },
   -- ["clj"] = {
   --   icon = "",
   --   color = "#8dc149",
@@ -155,16 +230,36 @@ local icons = {
   --   color = "#cbcb41",
   --   name = "Coffee"
   -- },
+  ["conf"] = {
+    icon = get("gear"),
+    color = "#6d8086",
+    name = "Conf"
+  },
   -- ["config.ru"] = {
   --   icon = "",
   --   color = "#701516",
   --   name = "ConfigRu"
   -- },
+  ["cp"] = {
+    icon = get("c-plusplus"),
+    color = "#519aba",
+    name = "Cp"
+  },
+  ["cpp"] = {
+    icon = get("c-plusplus"),
+    color = "#519aba",
+    name = "Cpp"
+  },
   -- ["csh"] = {
   --   icon = "",
   --   color = "#4d5a5e",
   --   name = "Csh"
   -- },
+  ["css"] = {
+    icon = get("css"),
+    color = "#563d7c",
+    name = "Css"
+  },
   -- ["cxx"] = {
   --   icon = "",
   --   color = "#519aba",
@@ -175,11 +270,26 @@ local icons = {
   --   color = "#427819",
   --   name = "D"
   -- },
+  ["dart"] = {
+    icon = get("dart"),
+    color = "#03589C",
+    name = "Dart"
+  },
+  ["db"] = {
+    icon = get("database"),
+    color = "#dad8d8",
+    name = "Db"
+  },
   -- ["diff"] = {
   --   icon = "",
   --   color = "#41535b",
   --   name = "Diff"
   -- },
+  ["dockerfile"] = {
+    icon = get("docker"),
+    color = "#384d54",
+    name = "Dockerfile"
+  },
   -- ["dump"] = {
   --   icon = "",
   --   color = "#dad8d8",
@@ -230,6 +340,11 @@ local icons = {
   --   color = "#cbcb41",
   --   name = "Favicon"
   -- },
+  ["fish"] = {
+    icon = get("terminal"),
+    color = "#4d5a5e",
+    name = "Fish"
+  },
   -- ["fs"] = {
   --   icon = "",
   --   color = "#519aba",
@@ -260,6 +375,11 @@ local icons = {
   --   color = "#a074c4",
   --   name = "Gif"
   -- },
+  ["go"] = {
+    icon = get("go"),
+    color = "#519aba",
+    name = "Go"
+  },
   -- ["h"] = {
   --   icon = "",
   --   color = "#a074c4",
@@ -295,21 +415,66 @@ local icons = {
   --   color = "#a074c4",
   --   name = "Hs"
   -- },
+  ["htm"] = {
+    icon = get("html"),
+    color = "#e34c26",
+    name = "Htm"
+  },
+  ["html"] = {
+    icon = get("html"),
+    color = "#e34c26",
+    name = "Html"
+  },
   -- ["hxx"] = {
   --   icon = "",
   --   color = "#a074c4",
   --   name = "Hxx"
   -- },
+  ["ico"] = {
+    icon = get("image"),
+    color = "#cbcb41",
+    name = "Ico"
+  },
   -- ["ini"] = {
   --   icon = "",
   --   color = "#6d8086",
   --   name = "Ini"
   -- },
+  ["java"] = {
+    icon = get("java"),
+    color = "#cc3e44",
+    name = "Java"
+  },
   -- ["jl"] = {
   --   icon = "",
   --   color = "#a270ba",
   --   name = "Jl"
   -- },
+  ["jpeg"] = {
+    icon = get("image"),
+    color = "#a074c4",
+    name = "Jpeg"
+  },
+  ["jpg"] = {
+    icon = get("image"),
+    color = "#a074c4",
+    name = "Jpg"
+  },
+  ["js"] = {
+    icon = get("javascript"),
+    color = "#cbcb41",
+    name = "Js"
+  },
+  ["json"] = {
+    icon = get("json"),
+    color = "#cbcb41",
+    name = "Json"
+  },
+  ["jsx"] = {
+    icon = get("react"),
+    color = "#519aba",
+    name = "Jsx"
+  },
   -- ["ksh"] = {
   --   icon = "",
   --   color = "#4d5a5e",
@@ -330,6 +495,36 @@ local icons = {
   --   color = "#a074c4",
   --   name = "Lhs"
   -- },
+  ["license"] = {
+    icon = get("file-badge"),
+    color = "#cbcb41",
+    name = "License"
+  },
+  ["lua"] = {
+    icon = get("lua"),
+    color = "#51a0cf",
+    name = "Lua"
+  },
+  ["makefile"] = {
+    icon = get("terminal"),
+    color = "#6d8086",
+    name = "Makefile"
+  },
+  ["markdown"] = {
+    icon = get("markdown"),
+    color = "#519aba",
+    name = "Markdown"
+  },
+  ["md"] = {
+    icon = get("markdown"),
+    color = "#519aba",
+    name = "Md"
+  },
+  ["mdx"] = {
+    icon = get("markdown"),
+    color = "#519aba",
+    name = "Mdx"
+  },
   -- ["mix.lock"] = {
   --   icon = "",
   --   color = "#a074c4",
@@ -360,11 +555,31 @@ local icons = {
   --   color = "#7ebae4",
   --   name = "Nix"
   -- },
+  ["node_modules"] = {
+    icon = get("npm"),
+    color = "#E8274B",
+    name = "NodeModules"
+  },
+  ["php"] = {
+    icon = get("php"),
+    color = "#a074c4",
+    name = "Php"
+  },
+  ["pl"] = {
+    icon = get("perl"),
+    color = "#519aba",
+    name = "Pl"
+  },
   -- ["pm"] = {
   --   icon = "",
   --   color = "#519aba",
   --   name = "Pm"
   -- },
+  ["png"] = {
+    icon = get("image"),
+    color = "#a074c4",
+    name = "Png"
+  },
   -- ["pp"] = {
   --   icon = "",
   --   color = "#302B6D",
@@ -385,6 +600,46 @@ local icons = {
   --   color = "#519aba",
   --   name = "Psd"
   -- },
+  ["py"] = {
+    icon = get("python"),
+    color = "#3572A5",
+    name = "Py"
+  },
+  ["pyc"] = {
+    icon = get("python"),
+    color = "#519aba",
+    name = "Pyc"
+  },
+  ["pyd"] = {
+    icon = get("python"),
+    color = "#519aba",
+    name = "Pyd"
+  },
+  ["pyo"] = {
+    icon = get("python"),
+    color = "#519aba",
+    name = "Pyo"
+  },
+  ["r"] = {
+    icon = get("r"),
+    color = "#358a5b",
+    name = "R"
+  },
+  ["rake"] = {
+    icon = get("ruby"),
+    color = "#701516",
+    name = "Rake"
+  },
+  ["rakefile"] = {
+    icon = get("ruby"),
+    color = "#701516",
+    name = "Rakefile"
+  },
+  ["rb"] = {
+    icon = get("ruby"),
+    color = "#701516",
+    name = "Rb"
+  },
   -- ["rlib"] = {
   --   icon = "",
   --   color = "#dea584",
@@ -400,16 +655,36 @@ local icons = {
   --   color = "#358a5b",
   --   name = "Rproj"
   -- },
+  ["rs"] = {
+    icon = get("rust"),
+    color = "#dea584",
+    name = "Rs"
+  },
+  ["rss"] = {
+    icon = get("rss"),
+    color = "#FB9D3B",
+    name = "Rss"
+  },
   -- ["sass"] = {
   --   icon = "",
   --   color = "#f55385",
   --   name = "Sass"
   -- },
+  ["scala"] = {
+    icon = get("scala"),
+    color = "#cc3e44",
+    name = "Scala"
+  },
   -- ["scss"] = {
   --   icon = "",
   --   color = "#f55385",
   --   name = "Scss"
   -- },
+  ["sh"] = {
+    icon = get("terminal"),
+    color = "#4d5a5e",
+    name = "Sh"
+  },
   -- ["slim"] = {
   --   icon = "",
   --   color = "#e34c26",
@@ -420,6 +695,11 @@ local icons = {
   --   color = "#854CC7",
   --   name = "Sln"
   -- },
+  ["sql"] = {
+    icon = get("database"),
+    color = "#dad8d8",
+    name = "Sql"
+  },
   -- ["styl"] = {
   --   icon = "",
   --   color = "#8dc149",
@@ -430,6 +710,11 @@ local icons = {
   --   color = "#854CC7",
   --   name = "Suo"
   -- },
+  ["swift"] = {
+    icon = get("swift"),
+    color = "#e37933",
+    name = "Swift"
+  },
   -- ["t"] = {
   --   icon = "",
   --   color = "#519aba",
@@ -440,16 +725,46 @@ local icons = {
   --   color = "#3D6117",
   --   name = "Tex"
   -- },
+  ["toml"] = {
+    icon = get("toml"),
+    color = "#6d8086",
+    name = "Toml"
+  },
+  ["ts"] = {
+    icon = get("typescript"),
+    color = "#519aba",
+    name = "Ts"
+  },
+  ["tsx"] = {
+    icon = get("react"),
+    color = "#519aba",
+    name = "Tsx"
+  },
   -- ["twig"] = {
   --   icon = "",
   --   color = "#8dc149",
   --   name = "Twig"
   -- },
+  ["vim"] = {
+    icon = get("vim"),
+    color = "#019833",
+    name = "Vim"
+  },
+  ["vue"] = {
+    icon = get("vue"),
+    color = "#8dc149",
+    name = "Vue"
+  },
   -- ["webmanifest"] = {
   --   icon = "",
   --   color = "#f1e05a",
   --   name = "Webmanifest"
   -- },
+  ["webp"] = {
+    icon = get("image"),
+    color = "#a074c4",
+    name = "Webp"
+  },
   -- ["xcplayground"] = {
   --   icon = "",
   --   color = "#e37933",
@@ -460,6 +775,31 @@ local icons = {
   --   color = "#e37933",
   --   name = "Xul"
   -- },
+  ["yaml"] = {
+    icon = get("yaml"),
+    color = "#6d8086",
+    name = "Yaml"
+  },
+  ["yml"] = {
+    icon = get("yaml"),
+    color = "#6d8086",
+    name = "Yml"
+  },
+  ["zsh"] = {
+    icon = get("terminal"),
+    color = "#89e051",
+    name = "Zsh"
+  },
+  ["terminal"] = {
+    icon = get("terminal"),
+    color = "#31B53E",
+    name = "Terminal"
+  },
+  ["default"] = {
+    icon = get("file"),
+    color = "#6d8086",
+    name = "Default"
+  }
   -- ["pdf"] = {
   --   icon = "",
   --   color = "#b30b00",

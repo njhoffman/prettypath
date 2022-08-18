@@ -8,22 +8,23 @@ local default_opts = {
     missing  = '#334455',
   },
   -- size, access, mod, create, access_ago, mod_ago, create_ago
-  format      = "%score% %icon% %dir%%name%",
   force_256   = false,
   color_icons = true,
   color_name  = 0,
 }
 
 local opts = {
-  colors     = {
+  colors       = {
     path_dir  = '#556789',
     path_file = '#4489bb',
   },
-  stat_file  = false,
-  home_name  = "~",
+  format       = "%score% %icon% %dir%%name%",
+  stat_file    = true,
+  home_name    = "~",
   -- 0 (false) - 100 (true)
-  color_icon = true,
-  color_file = false,
+  color_icon   = true,
+  color_name   = false,
+  output_stats = true
 }
 
 return opts

@@ -24,7 +24,7 @@ local opts = {
   -- 0 (false) - 100 (true)
   color_icon   = true,
   color_name   = false,
-  output_stats = true
+  output_stats = false
 }
 
 return opts

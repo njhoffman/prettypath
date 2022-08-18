@@ -1,7 +1,7 @@
 #!/usr/bin/env lua
 
-local prettyfile = require('prettyfile')
-local utils = require('utils')
+local prettyfile = require('prettypath')
+local utils = require('prettypath.utils')
 
 local stdin = io.stdin:lines()
 local stdout = io.write

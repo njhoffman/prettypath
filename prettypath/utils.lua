@@ -1,11 +1,11 @@
-local format = require('format')
-local opts = require('opts')
-local color = require('color')
-local inspect = require('inspect')
+local uv = require("luv") -- "luv" when stand-alone, "uv" in luvi apps
+local format = require('prettypath.format')
+local opts = require('prettypath.opts')
+local color = require('prettypath.color')
+local inspect = require('prettypath.inspect')
 
 local file_stat = function(path)
   -- luarocks install luv
-  local uv = require("luv") -- "luv" when stand-alone, "uv" in luvi apps
   local stat = uv.fs_stat(path)
 
   if stat == nil then return stat end

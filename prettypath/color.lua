@@ -1,4 +1,4 @@
-local opts = require('opts')
+local opts = require('prettypath.opts')
 
 local hex2rgb = function(hex)
   hex = hex:gsub("#", "")

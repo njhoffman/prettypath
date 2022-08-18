@@ -1,4 +1,4 @@
-local iconmap = require('iconmap')
+local iconmap = require('prettypath.iconmap')
 
 local function override(icons, filetypes)
   for k, v in pairs(icons or {}) do iconmap.icons[k] = v end

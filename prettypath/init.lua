@@ -1,8 +1,8 @@
-local devicons = require('devicons')
-local opts = require('opts')
-local utils = require('utils')
+local devicons = require('prettypath.devicons')
+local opts = require('prettypath.opts')
+local utils = require('prettypath.utils')
 
-local overriden = require("override")
+local overriden = require("prettypath.override")
 devicons.override(overriden.icons)
 
 local stats = {

@@ -1,4 +1,4 @@
-local nonicons = require("nonicons")
+local nonicons = require("prettypath.nonicons")
 
 local function get(name)
   return nonicons[name]

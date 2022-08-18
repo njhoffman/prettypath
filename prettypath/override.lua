@@ -3,12 +3,92 @@ local icons = {
     icon = " ",
     color = "#404bad",
     name = "mp3",
+    double = true,
+  },
+  ["m4a"] = {
+    icon = " ",
+    color = "#804b4d",
+    name = "m4a",
+    double = true,
+  },
+  ["flac"] = {
+    icon = " ",
+    color = "#408b8d",
+    name = "flac",
+    double = true,
+  },
+  ["wav"] = {
+    icon = " ",
+    color = "#605BFD",
+    name = "wav",
+    double = true,
   },
   ["pgsql"] = {
     icon = "",
     color = "#dad8d8",
     name = "Sql",
   },
+  ["Gemfile$"] = {
+    icon = " ",
+    color = "#701516",
+    name = "Gemfile",
+    double = true,
+  },
+  ["txt"] = {
+    icon = " ",
+    color = "#407b81",
+    name = "Text file",
+    double = true,
+  },
+  ["dic"] = {
+    icon = " ",
+    color = "#cbcb41",
+    name = "Metafont",
+    double = true,
+  },
+  ["socket"] = {
+    icon = "",
+    color = "#303588",
+    name = "Socket",
+    double = true,
+  },
+  ["service"] = {
+    icon = "⏻",
+    color = "#701588",
+    name = "SystemD Service",
+    double = true,
+  },
+  ["Makefile"] = {
+    icon = "",
+    color = "#185abd",
+    name = "Makefile",
+  },
+  ["Kconfig"] = {
+    icon = "",
+    color = "#cbcb41",
+    name = "Kernel config",
+  },
+  ["Kbuild"] = {
+    icon = "",
+    color = "#e37933",
+    name = "Kernel compile",
+  },
+  ["gz"] = {
+    icon = "",
+    color = "#6d80c6",
+    name = "Gzip",
+  },
+  ["zip"] = {
+    icon = "",
+    color = "#6d8086",
+    name = "Zip",
+  },
+  ["tar"] = {
+    icon = "",
+    color = "#9d8086",
+    name = "Tar",
+  },
+  -- bz2, rst, README.*, .so, .lang, .cache
 
   -- ["gruntfile"] = {
   --   icon = "",

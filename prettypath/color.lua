@@ -13,29 +13,41 @@ local to_ansi = function(text, color)
   return ansi .. text .. reset
 end
 
-local color_icon = function(icon_data)
-  if opts.color_icon == false then return icon_data.icon end
+local color_icon = function(icon_data, is_missing)
   -- lua converts \ followed by decimal number to ASCII equivalent
   -- use \27 to obtain the bash \033 ESC character
-  local ansi = to_ansi(icon_data.icon, icon_data.color)
-  return ansi
-end
-
-local color_name = function(name)
-  if opts.color_name == false then
-    if opts.colors.path_file ~= nil then
-      return to_ansi(name, opts.colors.path_name)
-    end
-    return name
-  end
-end
-
-local color_dir = function(dirname)
-  if opts.colors.path_dir ~= nil then
-    return to_ansi(dirname, opts.colors.path_dir)
+  local icon_space = icon_data.double and "" or " "
+  local icon = icon_data.icon .. icon_space
+  if is_missing then
+    return to_ansi(icon, opts.colors.missing)
+  elseif opts.color_icon ~= false then
+    return to_ansi(icon, icon_data.color)
   else
-    return dirname
+    return icon
   end
+end
+
+local color_name = function(name, is_missing)
+  if opts.color_name ~= false then
+    -- TODO: colorize name from 1-100
+    return name
+  elseif is_missing then
+    return to_ansi(name, opts.colors.missing)
+  elseif opts.colors.path_name ~= nil then
+    return to_ansi(name, opts.colors.path_name)
+  end
+  return name
+end
+
+local color_dir = function(dirname, is_missing)
+  if opts.colors.path_dir ~= nil then
+    if is_missing then
+      return to_ansi(dirname, opts.colors.missing)
+    else
+      return to_ansi(dirname, opts.colors.path_dir)
+    end
+  end
+  return dirname
 end
 
 return {

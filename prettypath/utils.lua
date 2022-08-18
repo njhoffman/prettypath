@@ -19,17 +19,20 @@ local file_stat = function(path)
 end
 
 local token_formatters = {
+  path       = function(pathinfo)
+    return format.nop(pathinfo.path)
+  end,
   score      = function(pathinfo)
     return format.nop(pathinfo.score)
   end,
   icon       = function(pathinfo)
-    return color.icon(pathinfo.icon_data)
+    return color.icon(pathinfo.icon_data, pathinfo.missing)
   end,
   dir        = function(pathinfo)
-    return color.dir(pathinfo.dir)
+    return color.dir(pathinfo.dir, pathinfo.missing)
   end,
   name       = function(pathinfo)
-    return color.name(pathinfo.name)
+    return color.name(pathinfo.name, pathinfo.missing)
   end,
   size       = function(pathinfo)
     return format.size(pathinfo.size)

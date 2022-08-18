@@ -2,16 +2,17 @@ package = "prettypath"
 version = "dev-1"
 source = {
   url = "git+https://github.com/njhoffman/prettypath"
+  -- tag = "v1.0",
 }
 description = {
-  summary = "Formatted path output with colored icons",
+  summary = "Highly configurable path decorator with devicons",
   detailed = [[
-      This is an example for the LuaRocks tutorial.
-      Here we would put a detailed, typically
-      paragraph-long description.
+   prettypath, CLI program to pipe filepaths through for decoration,
+   including devicon output similar to nvim-web-devicons.  Also allows
+   optional file scanning for additional tags (like size, date of last access, etc)
    ]],
   homepage = "https://github.com/njhoffman/prettypath",
-  license = "*** please specify a license ***"
+  license = "MIT",
 }
 dependencies = {
   "lua >= 5.4",
@@ -34,7 +35,6 @@ build = {
       ["prettypath.devicons"]          = "prettypath/devicons.lua",
       ["prettypath.format"]            = "prettypath/format.lua",
       ["prettypath.iconmap"]           = "prettypath/iconmap.lua",
-      ["prettypath.init"]              = "prettypath/init.lua",
       ["prettypath.inspect"]           = "prettypath/inspect.lua",
       ["prettypath.nonicons"]          = "prettypath/nonicons.lua",
       ["prettypath.opts"]              = "prettypath/opts.lua",

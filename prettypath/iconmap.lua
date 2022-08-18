@@ -34,6 +34,11 @@
 -- When adding new icons, remember to add an entry to the `filetypes` table, if applicable.
 
 local icons = {
+  ["/"] = {
+    icon = "",
+    color = "#4d70aa",
+    name = "Directory",
+  },
   [""] = {
     icon = "",
     color = "#6d8086",
@@ -878,6 +883,7 @@ local icons = {
     icon = "鉶",
     color = "#358a5b",
     name = "Rproj",
+    double = true
   },
   ["rs"] = {
     icon = "",
@@ -1103,6 +1109,7 @@ local icons = {
     icon = "謹",
     color = "#e37933",
     name = "Xml",
+    double = true,
   },
   ["xul"] = {
     icon = "",
@@ -1321,6 +1328,7 @@ local filetypes = {
 }
 
 return {
-  filetypes = filetypes,
-  icons     = icons,
+  filetypes      = filetypes,
+  icons          = icons,
+  directory_icon = directory_icon
 }

@@ -13,12 +13,13 @@ end
 local stats = prettypath.stats or {}
 
 if opts.output_stats == true then
-  print('\n------\n' ..
-    'Unassigned:\t' .. #stats.unassigned ..
-    '\n' .. 'Missing:\t' .. #stats.missing ..
-    '\n' .. 'Total:\t\t' .. stats.total .. '\n')
-
+  print('\n------\n')
   for _, path in pairs(stats.unassigned) do
     print(path)
   end
+
+  print('\n\n' .. 'Unassigned:\t' .. #stats.unassigned ..
+    '\n' .. 'Missing:\t' .. #stats.missing ..
+    '\n' .. 'Total:\t\t' .. stats.total .. '\n')
+
 end

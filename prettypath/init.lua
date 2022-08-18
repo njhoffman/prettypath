@@ -23,10 +23,6 @@ local pretty_path = function(path, user_opts, path_type)
     pathinfo.dir = string.gsub(dir, os.getenv('HOME') or '', '~')
     pathinfo.name = path:match("^.+/(.+)$")
   end
-  pathinfo.icon_data = devicons.get(pathinfo.name)
-  if pathinfo.icon_data.name == 'Default' then
-    table.insert(stats.unassigned, path)
-  end
 
   if (opts.stat_file) then
     local filestat = utils.file_stat(pathinfo.path)
@@ -41,6 +37,11 @@ local pretty_path = function(path, user_opts, path_type)
     end
   else
     stats.total = stats.total + 1
+  end
+
+  pathinfo.icon_data = devicons.get(pathinfo.name, pathinfo.type)
+  if pathinfo.icon_data.name == 'Default' then
+    table.insert(stats.unassigned, path)
   end
   local parsed_str = utils.format_path(pathinfo, user_opts)
   return parsed_str

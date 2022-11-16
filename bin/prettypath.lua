@@ -2,12 +2,13 @@
 
 local prettypath = require('prettypath')
 local opts = require('prettypath.opts')
--- local utils = require('utils')
 
 local stdin = io.stdin:lines()
-local stdout = io.write
 for line in stdin do
-  stdout(prettypath.pretty_path(line) .. '\n')
+  -- allow pipe to be interrupted without error
+  pcall(function()
+    io.write(prettypath.pretty_path(line) .. '\n')
+  end)
 end
 
 local stats = prettypath.stats or {}

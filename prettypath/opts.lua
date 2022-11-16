@@ -11,13 +11,16 @@ local default_opts = {
 }
 
 local opts = {
-  colors       = {
+  colors = {
     missing   = '#334455',
     path_dir  = '#556789',
     path_name = '#4489bb',
   },
+
+  -- \u00a0
   -- format       = "%score% %icon% %dir%%name%",
   format       = "%path% %icon% %dir%%name%",
+  -- format       = "%path%: %icon%: %dir%:%name%",
   -- format       = "%path% %icon% %dir%%name%",
   stat_file    = true,
   home_name    = "~",

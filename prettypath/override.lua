@@ -1,108 +1,129 @@
 local icons =
   {
     --- custom icons ---
-    ['mp3'] = {
-      icon = ' ',
-      color = '#404bad',
-      name = 'mp3',
-      double = true,
-    },
-    ['m4a'] = {
-      icon = ' ',
-      color = '#804b4d',
-      name = 'm4a',
-      double = true,
-    },
-    ['flac'] = {
-      icon = ' ',
-      color = '#408b8d',
-      name = 'flac',
-      double = true,
-    },
-    ['wav'] = {
-      icon = ' ',
-      color = '#605BFD',
-      name = 'wav',
-      double = true,
-    },
-    ['pgsql'] = {
-      icon = '',
-      color = '#dad8d8',
-      name = 'Sql',
-    },
-    ['Gemfile$'] = {
-      icon = ' ',
-      color = '#701516',
-      name = 'Gemfile',
-      double = true,
-    },
-    ['txt'] = {
-      icon = ' ',
-      color = '#407b81',
-      name = 'Text file',
-      double = true,
-    },
-    ['dic'] = {
-      icon = ' ',
-      color = '#cbcb41',
-      name = 'Metafont',
-      double = true,
-    },
-    ['socket'] = {
-      icon = '',
-      color = '#303588',
-      name = 'Socket',
-      double = true,
-    },
-    ['service'] = {
-      icon = '⏻',
-      color = '#701588',
-      name = 'SystemD Service',
-      double = true,
-    },
-    ['Makefile'] = {
-      icon = '',
-      color = '#185abd',
-      name = 'Makefile',
-    },
-    ['Kconfig'] = {
-      icon = '',
-      color = '#cbcb41',
-      name = 'Kernel config',
-    },
-    ['Kbuild'] = {
-      icon = '',
-      color = '#e37933',
-      name = 'Kernel compile',
-    },
-    ['gz'] = {
-      icon = '',
-      color = '#6d80c6',
-      name = 'Gzip',
-    },
-    ['zip'] = {
-      icon = '',
-      color = '#6d8086',
-      name = 'Zip',
-    },
-    ['tar'] = {
-      icon = '',
-      color = '#9d8086',
-      name = 'Tar',
-    },
-    ['scm'] = {
-      icon = '',
-      color = '#27a79a',
-      cterm_color = '36',
-      name = 'Scm',
-    },
-    ['zsh'] = {
-      icon = '',
-      color = '#428850',
-      cterm_color = '65',
-      name = 'Zsh',
-    },
-    -- bz2, rst, README.*, .so, .lang, .cache
+  ['rockspec'] = {
+    icon = '',
+    color = '#f34436',
+    cterm_color = '203',
+    name = 'rockspec',
+  },
+  ['mp3'] = {
+    icon = '',
+    color = '#404bad',
+    cterm_color = '104',
+    name = 'mp3',
+  },
+  ['m4a'] = {
+    icon = '',
+    color = '#804b4d',
+    cterm_color = '216',
+    name = 'm4a',
+  },
+  ['flac'] = {
+    icon = '',
+    color = '#408b8d',
+    cterm_color = '36',
+    name = 'flac',
+  },
+  ['wav'] = {
+    icon = '',
+    color = '#605BFD',
+    cterm_color = '27',
+    name = 'wav',
+  },
+  ['pgsql'] = {
+    icon = '',
+    color = '#dad8d8',
+    cterm_color = '188',
+    name = 'Sql',
+  },
+  ['Gemfile$'] = {
+    icon = '',
+    color = '#701516',
+    name = 'Gemfile',
+    cterm_color = '1',
+  },
+  ['txt'] = {
+    icon = '',
+    color = '#407b81',
+    cterm_color = '36',
+    name = 'Text.file',
+  },
+  ['dic'] = {
+    icon = '',
+    color = '#cbcb41',
+    cterm_color = '142',
+    name = 'Metafont',
+  },
+  ['socket'] = {
+    icon = '',
+    color = '#303588',
+    cterm_color = '104',
+    name = 'Socket',
+  },
+  ['service'] = {
+    icon = '⏻',
+    color = '#701588',
+    cterm_color = '133',
+    name = 'SystemD.Service',
+  },
+  ['Makefile'] = {
+    icon = '',
+    color = '#185abd',
+    cterm_color = '31',
+    name = 'Makefile',
+  },
+  ['Kconfig'] = {
+    icon = '',
+    cterm_color = '142',
+    color = '#cbcb41',
+    name = 'Kernel.config',
+  },
+  ['Kbuild'] = {
+    icon = '',
+    color = '#e37933',
+    name = 'Kernel.compile',
+    cterm_color = '208',
+  },
+  ['gz'] = {
+    icon = '',
+    color = '#6d80c6',
+    cterm_color = '75',
+    name = 'Gzip',
+  },
+  ['zip'] = {
+    icon = '',
+    color = '#6d8086',
+    cterm_color = '240',
+    name = 'Zip',
+  },
+  ['tar'] = {
+    icon = '',
+    color = '#9d8086',
+    cterm_color = '104',
+    name = 'Tar',
+  },
+  ['scm'] = {
+    icon = '',
+    color = '#27a79a',
+    cterm_color = '36',
+    name = 'Scm',
+  },
+
+  ['sh'] = {
+    icon = '',
+    color = '#27a79a',
+    cterm_color = '36',
+    name = 'Sh',
+  },
+  ['zsh'] = {
+    icon = '',
+    color = '#428850',
+    cterm_color = '65',
+    name = 'Zsh',
+  },
+}
+    -- .jq, bz2, rst, README.*, .so, .lang, .cache
     --- override icons ---
     Brewfile = {
       color = '#701516',

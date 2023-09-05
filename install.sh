@@ -1,4 +1,4 @@
 #!/bin/bash
 
-luarocks make prettypath-dev-1.rockspec
+luarocks make prettypath-dev-2.rockspec
 asdf reshim

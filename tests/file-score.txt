@@ -1,0 +1,5 @@
+41.2526    /home/nicholas/.fzf/core/fzf.sh
+34.7467    /home/nicholas/.fzf/functions.zsh
+33.4193    /home/nicholas/ghq/github.com/ashish0kumar/cwalk/cwalk.c
+25.7948    /etc/X11/Xsession
+18.2965    /home/nicholas/.env

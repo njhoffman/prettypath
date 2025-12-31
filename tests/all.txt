@@ -1,0 +1,6 @@
+/home/nicholas/.config/nvim
+/home/nicholas/scratch/fzf
+/home/nicholas/scratch/file with spaces.sh
+/home/nicholas/.fzf/functions.zsh
+/home/nicholas/.config/tmux
+/home/nicholas/ghq/github.com/stashapp/stash

@@ -1,0 +1,9 @@
+116.053    /home/nicholas/.fzf
+3.14187    /home/nicholas/scratch/file with spaces.sh
+419.9 /home/nicholas/.config/nvim
+0.25       /home/nicholas/.claude/todos
+92.3942    /home/nicholas/.config/nvim
+100    /home/nicholas/.fzf/functions.zsh
+   4.6 /home/nicholas/zettelkasten
+62.6156    /home/nicholas/.config/tmux
+59.2832    /home/nicholas/ghq/github.com/stashapp/stash

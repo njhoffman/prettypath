@@ -1,5 +1,5 @@
-VERSION=dev-1
-REVISION=1
+VERSION=dev-3
+REVISION=3
 ROCKSPEC=prettypath-$(VERSION)-$(REVISION).rockspec
 date=$(shell date +%x)
 luas=prettypath.lua prettypath/*.lua prettypath/*/*.lua

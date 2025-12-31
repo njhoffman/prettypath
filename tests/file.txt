@@ -1,0 +1,5 @@
+/home/nicholas/.fzf/core/fzf.sh
+/home/nicholas/.fzf/functions.zsh
+/home/nicholas/ghq/github.com/ashish0kumar/cwalk/cwalk.c
+/etc/X11/Xsession
+/home/nicholas/.env

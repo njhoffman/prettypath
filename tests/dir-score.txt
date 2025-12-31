@@ -1,0 +1,5 @@
+116.053    /home/nicholas/.fzf
+92.3942    /home/nicholas/.config/nvim
+90.2184    /home/nicholas/scratch/fzf
+62.6156    /home/nicholas/.config/tmux
+59.2832    /home/nicholas/ghq/github.com/stashapp/stash

@@ -1,6 +1,0 @@
-/home/nicholas/.profile
-/home/nicholas/.zpath
-/home/nicholas/bin/backlight.sh
-/home/nicholas/mydoc.xml
-/home/nicholas/bin
-/home/nicholas/bin/tmux/

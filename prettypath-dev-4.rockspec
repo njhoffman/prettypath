@@ -1,5 +1,6 @@
 package = "prettypath"
 version = "dev-4"
+rockspec_format = "3.0"
 source = {
 	url = "git+https://github.com/njhoffman/prettypath",
 	-- tag = "v1.0",

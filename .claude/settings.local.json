@@ -1,0 +1,17 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(lua bin/prettypath.lua:*)",
+      "Bash(busted:*)",
+      "Bash(lua:*)",
+      "Bash(luarocks --version:*)",
+      "Bash(luarocks install:*)",
+      "Bash(~/.luarocks/bin/busted:*)",
+      "Bash(cat:*)",
+      "Bash(luacheck:*)",
+      "Bash(git mv:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}

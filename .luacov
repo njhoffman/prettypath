@@ -1,0 +1,41 @@
+-- luacov configuration
+-- https://keplerproject.github.io/luacov/
+
+return {
+	-- Filename to store statistics
+	statsfile = "luacov.stats.out",
+
+	-- Filename to store report
+	reportfile = "luacov.report.out",
+
+	-- Run reporter after test run
+	runreport = true,
+
+	-- Delete stats file after generating report
+	deletestats = false,
+
+	-- Patterns for files to include
+	include = {
+		"prettypath",
+		"prettypath/",
+		"bin/prettypath",
+	},
+
+	-- Patterns for files to exclude
+	exclude = {
+		"spec/",
+		"prettypath/inspect",
+		"luarocks/",
+		"lua_modules/",
+	},
+
+	-- configuration for reporter
+	reporter = "default",
+
+	-- configuration for multiple reporters
+	reporters = {
+		default = {
+			summaryfile = "luacov.summary.out",
+		},
+	},
+}

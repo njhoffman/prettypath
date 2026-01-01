@@ -1,4 +1,4 @@
-VERSION=dev-3
+VERSION=dev-4
 REVISION=3
 ROCKSPEC=prettypath-$(VERSION)-$(REVISION).rockspec
 date=$(shell date +%x)
@@ -17,22 +17,39 @@ all: build
 build: $(ROCKSPEC)
 	luarocks make $(ROCKSPEC)
 
-.PHONY: build test testall check rock bench docs clean run-code-examples install website standalone
+.PHONY: build test test-unit test-watch test-verbose test-coverage check lint format rock bench docs clean run-code-examples install website standalone
 
 rock: $(ROCKSPEC)
 	luarocks --local make $(ROCKSPEC)
 
-check:
-	luacheck bin/prettypath prettypath/*.lua prettypath/*/*.lua
+# Linting and formatting
+check: lint
+	@echo "Lint passed"
 
+lint:
+	luacheck bin/prettypath.lua prettypath/*.lua spec/*.lua
+
+format:
+	stylua bin/*.lua prettypath/*.lua spec/*.lua
+
+format-check:
+	stylua --check bin/*.lua prettypath/*.lua spec/*.lua
+
+# Testing
 test:
-	LUAPATH="?.lua;prettypath/?.lua;prettypath/?/?.lua;$$LUAPATH"
-	prettypath_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/Markdown_1.0.3 -p ${PROG} ${OPTS}
-	prettypath_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/prettypath -p ${PROG} ${OPTS}
+	busted
 
-testall: test
-	LUAPATH="?.lua;prettypath/?.lua;prettypath/?/?.lua;$$LUAPATH"
-	prettypath_EXTENSIONS="" bin/shtest ${TESTOPTS} -d tests/PHP_Markdown -p ${PROG} ${OPTS}
+test-unit:
+	busted --exclude-tags=integration
+
+test-watch:
+	busted --watch
+
+test-verbose:
+	busted --verbose
+
+test-coverage:
+	busted --coverage && luacov
 
 $(ROCKSPEC): rockspec.in
 	sed -e "s/_VERSION/$(VERSION)/g; s/_REVISION/$(REVISION)/g" $< > $@

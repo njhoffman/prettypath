@@ -1,0 +1,41 @@
+# Lua artifacts
+*.luac
+lua_modules/
+.luarocks/
+
+# Luacov coverage
+luacov.stats.out
+luacov.report.out
+luacov.summary.out
+
+# Test artifacts
+.busted_cache/
+
+# Build artifacts
+*.rock
+*.src.rock
+
+# Benchmark/test temp files
+tmptest.txt
+benchtext.txt
+
+# Documentation build
+doc/
+*.1
+*.1.html
+
+# Editor files
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local config
+.envrc
+.env.local

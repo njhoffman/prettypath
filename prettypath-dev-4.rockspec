@@ -1,5 +1,5 @@
 package = "prettypath"
-version = "dev-3"
+version = "dev-4"
 source = {
 	url = "git+https://github.com/njhoffman/prettypath",
 	-- tag = "v1.0",
@@ -17,6 +17,12 @@ description = {
 dependencies = {
 	"lua-filesize >= 0.1.1-1",
 	"luv >= 1.44.2-0",
+}
+test_dependencies = {
+	"busted >= 2.0.0",
+}
+test = {
+	type = "busted",
 }
 build = {
 	type = "none",

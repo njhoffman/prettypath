@@ -77,8 +77,18 @@ run-code-examples: prettypath.lua
 	@echo Running code examples... ;\
 	grep -e '^--     ' $< | sed -e 's/^--     //' | lua
 
-install: ${luas}
-	luarocks make
+# luarocks install, then the launcher over its wrapper (luajit when installed, no luarocks.loader at startup);
+# LUAROCKS="luarocks" for a system-wide tree
+LUAROCKS ?= luarocks --local
+DEV_ROCKSPEC = prettypath-dev-4.rockspec
+install:
+	$(LUAROCKS) make $(DEV_ROCKSPEC)
+	bash scripts/install-launcher.sh \
+		"$$($(LUAROCKS) config deploy_bin_dir)/prettypath" \
+		"$$($(LUAROCKS) config deploy_lua_dir)" \
+		"$$($(LUAROCKS) config deploy_lib_dir)" \
+		"$$($(LUAROCKS) show --rock-dir prettypath)/bin/prettypath" \
+		"$$($(LUAROCKS) config variables.LUA)"
 
 website: docs ${web}/index.html
 	rm -r ${web}/doc ${web}/*.1.html

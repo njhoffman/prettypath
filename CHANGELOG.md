@@ -6,6 +6,15 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-10
+
+### Added
+- `make install` installs with luarocks and then replaces the luarocks wrapper with a launcher
+  (scripts/install-launcher.sh) that runs prettypath under luajit when it is installed (about twice as fast
+  per path) and lua5.1 otherwise, with the module paths set directly instead of through luarocks.loader, so
+  it also starts sooner. `PRETTYPATH_LUA=interpreter` picks the interpreter; `LUAROCKS="luarocks"` installs
+  into the system tree. A plain `luarocks make` still works and keeps the wrapper.
+
 ## [0.2.1] - 2026-11-10
 
 ### Added

@@ -20,16 +20,19 @@ Reviewed: 2026-11-10
 - [x] **No bookkeeping unless --output_stats** (p2) [perf]: `pretty_path` appends every path without an
       icon to `stats.unassigned` and every missing one to `stats.missing`, for the whole run. A 100k-path
       home directory listing keeps them all in memory to report nothing. Collect only with --output_stats.
-- [ ] **LuaJIT** (p2) [perf]: run under luajit when it is installed (the code is 5.1-compatible).
+- [x] **LuaJIT** (p2) [perf]: run under luajit when it is installed (the code is 5.1-compatible).
       Checked 2026-11-10 (LuaJIT 2.1, apt): the existing 5.1 luarocks tree (luv 1.51, lua-filesize) loads
       unchanged, and all specs pass under `busted --lua=luajit`. `make bench` CPU time on a loaded machine:
       default format 3.0 vs 6.3-14.6 µs/path, metadata format 11.9 vs 22.6-41.5, stat true 14.4 vs 15.9-32;
       about 2x where formatting dominates, little where stat does. Left: the installed binary is the
-      luarocks wrapper, which hardcodes /usr/bin/lua5.1. Decide how to switch it (luarocks
-      `lua_interpreter` config for the whole tree, or a launcher shared with Start faster).
-- [ ] **Start faster** (p3) [perf]: the luarocks wrapper loads `luarocks.loader` before the script; calling
-      lua5.1 directly with the same package paths started 20-55ms sooner in three (noisy) runs. Install a launcher that sets package.path directly; load the icon tables lazily
-      (override_*icons only when configured).
+      luarocks wrapper, which hardcodes /usr/bin/lua5.1. Done: `make install` writes a launcher
+      (scripts/install-launcher.sh) that runs luajit when installed.
+- [x] **Start faster** (p3) [perf]: the luarocks wrapper loads `luarocks.loader` before the script; calling
+      lua5.1 directly with the same package paths started 20-55ms sooner in three (noisy) runs. Done: the
+      `make install` launcher sets the module paths itself and skips luarocks.loader.
+- [ ] **Load icon tables lazily** (p3) [perf]: startup loads all of iconmap.lua and override.lua (and
+      nonicons through override_nonicons when used) before the first line. Measure their share of the
+      launcher's startup with `make bench`; load the override_*icons sets only when configured.
 - [x] **Benchmark target** (p3) [test]: `make bench` over a fixed list (say 20k paths with mixed
       extensions, directories and missing files), reporting startup and µs per path with stat on and off, so
       changes show their cost.

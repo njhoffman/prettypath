@@ -9,10 +9,12 @@ prettypath is a Lua CLI tool that decorates file paths with devicons (Nerd Font 
 ## Build & Install
 
 ```bash
-# Install via luarocks (recommended)
-luarocks make prettypath-dev-4.rockspec
+# Install (recommended): luarocks --local make, then scripts/install-launcher.sh writes a launcher over the
+# luarocks wrapper: luajit when installed (else lua5.1), module paths set directly, no luarocks.loader.
+# PRETTYPATH_LUA=interpreter overrides at run time; LUAROCKS="luarocks" installs system-wide.
+make install
 
-# Local install
+# Plain luarocks install (keeps the luarocks wrapper: lua5.1, slower startup)
 luarocks --local make prettypath-dev-4.rockspec
 ```
 

@@ -6,6 +6,13 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-11-10
+
+### Added
+- `make bench` reports startup and µs per path in CPU time (stat auto, true and false, and a metadata format) over
+  a fixed generated list of 20k files, directories and missing paths; `LUA=luajit`, `PATHS` and `RUNS`
+  adjust it. It replaces the Makefile's leftover bench and prof targets.
+
 ## [0.2.0] - 2026-11-10
 
 ### Added

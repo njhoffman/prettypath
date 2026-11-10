@@ -6,6 +6,8 @@ one category per item.
 Measured 2026-10-26 (lua 5.1 through the luarocks wrapper): 28ms to start, 13-30µs per path with
 `--stat_file=false` (15k paths in 0.45s on a busy machine; 20k in 0.26s in an earlier quiet run) and about 100µs with stat on (1.5s). fzx runs it over every file
 and directory list (`fzx -m files`, `dirs`, `recent`), so the per-path cost sets how fast big lists appear.
+`make bench` (bench/bench.sh; `LUA=luajit` to compare) reports startup and µs per path, in CPU time, on a
+fixed generated list; its header shows the load average, since even CPU time varies 2x on a busy machine.
 
 Reviewed: 2026-11-10
 
@@ -18,13 +20,17 @@ Reviewed: 2026-11-10
 - [x] **No bookkeeping unless --output_stats** (p2) [perf]: `pretty_path` appends every path without an
       icon to `stats.unassigned` and every missing one to `stats.missing`, for the whole run. A 100k-path
       home directory listing keeps them all in memory to report nothing. Collect only with --output_stats.
-- [ ] **LuaJIT** (p2) [perf]: run under luajit when it is installed (the code is 5.1-compatible); expect
-      the per-path cost to drop several times. Check `luv` builds for it
-      (luajit is not installed on this machine yet).
+- [ ] **LuaJIT** (p2) [perf]: run under luajit when it is installed (the code is 5.1-compatible).
+      Checked 2026-11-10 (LuaJIT 2.1, apt): the existing 5.1 luarocks tree (luv 1.51, lua-filesize) loads
+      unchanged, and all specs pass under `busted --lua=luajit`. `make bench` CPU time on a loaded machine:
+      default format 3.0 vs 6.3-14.6 µs/path, metadata format 11.9 vs 22.6-41.5, stat true 14.4 vs 15.9-32;
+      about 2x where formatting dominates, little where stat does. Left: the installed binary is the
+      luarocks wrapper, which hardcodes /usr/bin/lua5.1. Decide how to switch it (luarocks
+      `lua_interpreter` config for the whole tree, or a launcher shared with Start faster).
 - [ ] **Start faster** (p3) [perf]: the luarocks wrapper loads `luarocks.loader` before the script; calling
       lua5.1 directly with the same package paths started 20-55ms sooner in three (noisy) runs. Install a launcher that sets package.path directly; load the icon tables lazily
       (override_*icons only when configured).
-- [ ] **Benchmark target** (p3) [test]: `make bench` over a fixed list (say 20k paths with mixed
+- [x] **Benchmark target** (p3) [test]: `make bench` over a fixed list (say 20k paths with mixed
       extensions, directories and missing files), reporting startup and µs per path with stat on and off, so
       changes show their cost.
 - [ ] **Flush policy** (p3) [perf]: output is block-buffered, which is right for throughput; a

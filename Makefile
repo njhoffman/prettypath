@@ -3,8 +3,6 @@ REVISION=3
 ROCKSPEC=prettypath-$(VERSION)-$(REVISION).rockspec
 date=$(shell date +%x)
 luas=prettypath.lua prettypath/*.lua prettypath/*/*.lua
-testfile=tmptest.txt
-benchtext=benchtext.txt
 web=website
 templatesdir=templates
 NUM ?= 25
@@ -54,22 +52,9 @@ test-coverage:
 $(ROCKSPEC): rockspec.in
 	sed -e "s/_VERSION/$(VERSION)/g; s/_REVISION/$(REVISION)/g" $< > $@
 
-${benchtext}:
-	for i in tests/Markdown_1.0.3/*.test; do sed -e '1,/<<</d;/>>>/,$$d' "$$i" >> $@; echo >> $@.txt; done
-
-${testfile}: ${benchtext}
-	cat < /dev/null > ${testfile} ; \
-	x=${NUM}; \
-	while [ $$x -gt 0 ]; do \
-		cat $< >> $@; \
-	    	x=$$(($$x-1)); \
-	done
-
-bench: ${testfile}
-	time -p ${PROG} < ${testfile} > /dev/null
-
-prof:
-	lua -luatrace.profile ${PROG} ${benchtext} >/dev/null
+# startup and µs per path over a fixed generated list; LUA=luajit, PATHS=N, RUNS=N
+bench:
+	LUA="$(or $(LUA),lua)" bash bench/bench.sh
 
 coverage:
 	-rm luacov.stats.out ; \
@@ -106,5 +91,5 @@ standalone: ${luas}
 	make -C standalone
 
 clean:
-	-rm -rf doc ${testfile} ${benchtext} prettypath.1 lunadoc.1
+	-rm -rf doc prettypath.1 lunadoc.1
 	make -C standalone clean

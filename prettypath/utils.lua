@@ -70,7 +70,17 @@ end
 
 -- M.compile_format(fmt): the format as a list of literal strings and token functions, compiled once per
 -- format. Only %name% (lowercase letters and _) is a token; any other text, "%" included, is literal.
--- An unknown token is an error.
+-- An unknown token is an error. parts.needs_stat is true when a token reads file metadata.
+local stat_tokens = {
+	size = true,
+	access = true,
+	mod = true,
+	create = true,
+	access_ago = true,
+	mod_ago = true,
+	create_ago = true,
+}
+M.stat_tokens = stat_tokens
 local compiled = {}
 M.compile_format = function(fmt)
 	if compiled[fmt] then
@@ -90,6 +100,9 @@ M.compile_format = function(fmt)
 			parts[#parts + 1] = fmt:sub(pos, s - 1)
 		end
 		parts[#parts + 1] = fns[token]
+		if stat_tokens[token] then
+			parts.needs_stat = true
+		end
 		pos = e + 1
 	end
 	if pos <= #fmt then

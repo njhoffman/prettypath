@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-local VERSION = "dev-4"
+local VERSION = "0.1.0"
 
 local function print_version()
 	print("prettypath " .. VERSION)
@@ -18,7 +18,9 @@ Options:
   -h, --help          Show this help message and exit
   -v, --version       Show version and exit
   --format=FORMAT     Output format string (default: %path% %icon% %dir%%name%)
-  --stat_file=BOOL    Enable file stat for metadata tokens (default: true)
+  --stat_file=MODE    Stat each file: auto (only when the format has a metadata
+                      token: size, access, mod, create and their _ago forms),
+                      true (always; also dims missing files) or false (default: auto)
   --output_stats=BOOL Print statistics after processing (default: false)
 
 Format Tokens:
@@ -53,9 +55,20 @@ for _, a in ipairs(arg or {}) do
 	end
 end
 
-local prettypath = require("../prettypath")
-local opts = require("../prettypath/opts")
-local utils = require("../prettypath/utils")
+-- Find the modules next to this script (a checkout: <root>/bin/prettypath.lua) before installed ones.
+-- Requiring them as "prettypath.*" everywhere keeps one copy of each module: bin and the library share
+-- the same opts table and format cache.
+local script = (arg and arg[0]) or ""
+local root = script:match("^(.*)/bin/[^/]+$") or (script:match("^bin/[^/]+$") and ".")
+if root then
+	package.path = root .. "/?.lua;" .. root .. "/?/init.lua;" .. package.path
+end
+
+local prettypath = require("prettypath")
+local opts = require("prettypath.opts")
+local utils = require("prettypath.utils")
+
+opts.apply_args(arg)
 
 -- a bad format fails once, up front, instead of on every line
 local ok_format, format_err = pcall(utils.compile_format, opts.format)

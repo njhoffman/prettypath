@@ -11,11 +11,11 @@ Reviewed: 2026-11-10
 
 ## 1. Speed
 
-- [ ] **Stat only when the format needs it** (p1) [perf]: `--stat_file` defaults to true and triples the
+- [x] **Stat only when the format needs it** (p1) [perf]: `--stat_file` defaults to true and triples the
       per-path cost, but only `%size%`, `%mod%`, `%access%`, `%create%` and their `_ago` forms read the stat.
       Default to "auto": stat when the compiled format holds one of those tokens. Callers then stop passing
       `--stat_file=false` (fzx does on every call).
-- [ ] **No bookkeeping unless --output_stats** (p2) [perf]: `pretty_path` appends every path without an
+- [x] **No bookkeeping unless --output_stats** (p2) [perf]: `pretty_path` appends every path without an
       icon to `stats.unassigned` and every missing one to `stats.missing`, for the whole run. A 100k-path
       home directory listing keeps them all in memory to report nothing. Collect only with --output_stats.
 - [ ] **LuaJIT** (p2) [perf]: run under luajit when it is installed (the code is 5.1-compatible); expect
@@ -55,16 +55,16 @@ Reviewed: 2026-11-10
 
 ## 3. Correctness and packaging
 
-- [ ] **Library use parses the host's arg** (p2) [bug]: `require("prettypath")` from other Lua code (an
+- [x] **Library use parses the host's arg** (p2) [bug]: `require("prettypath")` from other Lua code (an
       nvim plugin) reads the host program's `arg` as prettypath options. Parse arguments only in
       bin/prettypath.lua.
-- [ ] **pretty_dir and pretty_file return nothing** (p2) [bug]: both call `pretty_path` without `return`.
-- [ ] **Rockspec misses modules** (p2) [bug]: override_materialicons and override_webicons are not listed,
+- [x] **pretty_dir and pretty_file return nothing** (p2) [bug]: both call `pretty_path` without `return`.
+- [x] **Rockspec misses modules** (p2) [bug]: override_materialicons and override_webicons are not listed,
       so a luarocks install lacks them.
-- [ ] **cli_spec expects dev-3** (p3) [test]: the version test still checks the old rockspec version.
+- [x] **cli_spec expects dev-3** (p3) [test]: the version test still checks the old rockspec version.
 - [ ] **Unassigned icons report** (p3) [chore]: run --output_stats over a large real listing (~/ghq, ~/.config)
       and add icons for the most common unassigned names and extensions.
-- [ ] **bin loads a second copy of each module** (p2) [bug]: bin/prettypath.lua requires `"../prettypath"`,
+- [x] **bin loads a second copy of each module** (p2) [bug]: bin/prettypath.lua requires `"../prettypath"`,
       `"../prettypath/opts"` and `"../prettypath/utils"`; Lua caches those under different names than the
       `prettypath.opts` / `prettypath.utils` the library uses, so bin and library each have their own opts
       table and format cache. Harmless while both parse `arg`, but it breaks the moment only bin parses it.

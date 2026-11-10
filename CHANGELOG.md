@@ -6,7 +6,25 @@ and were never tagged; their history is summarized under Unreleased.
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-11-10
+
+First semantic version; `--version` now prints `prettypath 0.1.0`.
+
+### Changed
+- `--stat_file` takes `auto`, the new default: files are statted only when the format has a metadata token
+  (`%size%`, `%access%`, `%mod%`, `%create%` and their `_ago` forms). Formats without one run about three
+  times faster and no longer dim missing files; pass `--stat_file=true` to keep the old behavior.
+- `--output_stats` is the only thing that collects the unassigned and missing path lists; without it a long
+  run no longer keeps every such path in memory.
+- `require("prettypath")` from other Lua code no longer reads the host program's `arg` as prettypath
+  options; the CLI applies its arguments with `opts.apply_args(arg)`.
+
 ### Fixed
+- `pretty_dir` and `pretty_file` return the formatted string instead of nothing.
+- The CLI loads one copy of each module, found next to the script, so it also runs from any directory.
+- The rockspec installs `prettypath.override_materialicons` and `prettypath.override_webicons`.
+
+### Fixed (earlier, unreleased dev versions)
 - A `%` in a file name or path is kept in the output instead of being dropped.
 - Paths directly under `/`, relative paths, `./` paths and paths with a trailing `/` (marked as directories)
   are formatted instead of rejected.

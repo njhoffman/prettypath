@@ -60,7 +60,7 @@ describe("cli", function()
 			local result = handle:read("*a")
 			handle:close()
 			assert.is_truthy(result:match("prettypath"))
-			assert.is_truthy(result:match("dev%-3") or result:match("%d+%.%d+"))
+			assert.is_truthy(result:match("^prettypath %d+%.%d+%.%d+\n$"))
 		end)
 
 		it("outputs version with -v", function()

@@ -26,6 +26,14 @@ local function cli(args, lines)
 	return out, e, code
 end
 
+-- raw CLI output (escapes kept) for one missing file
+local function raw(args)
+	local h = io.popen("echo /nonexistent/x.lua | lua bin/prettypath.lua " .. args)
+	local out = h:read("*a")
+	h:close()
+	return out
+end
+
 describe("regressions", function()
 	local prettypath
 
@@ -80,14 +88,44 @@ describe("regressions", function()
 		end)
 
 		it("--stat_file=false does not stat (a missing file is not marked missing)", function()
-			local missing = cli("--format=%name%", { "/nonexistent/x.lua" })
+			local missing = cli("--stat_file=true --format=%name%", { "/nonexistent/x.lua" })
 			local nostat = cli("--stat_file=false --format=%name%", { "/nonexistent/x.lua" })
 			assert.are.equal("x.lua", missing[1])
 			assert.are.equal("x.lua", nostat[1])
-			local raw_missing = io.popen("echo /nonexistent/x.lua | lua bin/prettypath.lua --format=%name%"):read("*a")
-			local raw_nostat = io.popen("echo /nonexistent/x.lua | lua bin/prettypath.lua --stat_file=false --format=%name%")
-				:read("*a")
-			assert.are_not.equal(raw_missing, raw_nostat)
+			assert.are_not.equal(raw("--stat_file=true --format=%name%"), raw("--stat_file=false --format=%name%"))
+		end)
+
+		it("--stat_file=auto (the default) stats only formats with a metadata token", function()
+			local default = raw("--format=%name%")
+			assert.are.equal(raw("--stat_file=false --format=%name%"), default)
+			assert.are.equal(raw("--stat_file=auto --format=%name%"), default)
+			-- %mod% needs the stat: the missing file is dimmed, as with --stat_file=true (dates stripped: the
+			-- two runs may straddle a second)
+			local function nodate(s)
+				return (s:gsub("%d+/%d+/%d+ %d+:%d+:%d+", ""))
+			end
+			local auto = nodate(raw("--format=%name%%mod%"))
+			assert.are.equal(nodate(raw("--stat_file=true --format=%name%%mod%")), auto)
+			assert.are_not.equal(nodate(raw("--stat_file=false --format=%name%%mod%")), auto)
+		end)
+
+		it("prints the size of an existing file by default", function()
+			local f = os.tmpname()
+			local h = io.open(f, "w")
+			h:write(string.rep("x", 2048))
+			h:close()
+			local out = cli("--format=%size%", { f })
+			os.remove(f)
+			assert.is_truthy(out[1]:match("^2"))
+			assert.is_truthy(out[1]:match("[kK]"))
+		end)
+
+		it("finds its modules when run from another directory", function()
+			local cwd = io.popen("pwd"):read("*l")
+			local out =
+				io.popen("cd / && echo /etc/hosts | lua " .. cwd .. "/bin/prettypath.lua --format='%name%|%dir%' 2>&1")
+					:read("*a")
+			assert.are.equal("hosts|/etc/", strip(out):gsub("\n$", ""))
 		end)
 
 		it("prints one line per input line", function()
@@ -95,5 +133,124 @@ describe("regressions", function()
 			local out = cli("--stat_file=false --format=%path%", input)
 			assert.are.same({ "/etc", "/etc", "lib/x.sh", "", "/a b/c%d.txt", "README.md" }, out)
 		end)
+	end)
+end)
+
+describe("library use", function()
+	insulate("require() with the host program's arg", function()
+		it("does not read arg as prettypath options", function()
+			local saved = _G.arg
+			_G.arg = { "--format=%name%", "--stat_file=false", "--output_stats=true" }
+			for name in pairs(package.loaded) do
+				if name == "prettypath" or name:match("^prettypath%.") then
+					package.loaded[name] = nil
+				end
+			end
+			local opts = require("prettypath.opts")
+			_G.arg = saved
+			-- the default format separates tokens with U+2007 (figure space); only check arg was not applied
+			assert.are_not.equal("%name%", opts.format)
+			assert.is_truthy(opts.format:find("%path%", 1, true))
+			assert.are.equal("auto", opts.stat_file)
+			assert.is_false(opts.output_stats)
+		end)
+	end)
+
+	describe("opts.apply_args", function()
+		local opts
+		local saved
+
+		before_each(function()
+			opts = require("prettypath.opts")
+			saved = { format = opts.format, stat_file = opts.stat_file, output_stats = opts.output_stats }
+		end)
+
+		after_each(function()
+			for k, v in pairs(saved) do
+				opts[k] = v
+			end
+		end)
+
+		it("parses format, stat_file (auto/bool) and output_stats", function()
+			opts.apply_args({ "--format=%name%", "--stat_file=AUTO", "--output_stats=yes", "positional" })
+			assert.are.equal("%name%", opts.format)
+			assert.are.equal("auto", opts.stat_file)
+			assert.is_true(opts.output_stats)
+			opts.apply_args({ "--stat_file=false" })
+			assert.is_false(opts.stat_file)
+			opts.apply_args({ "--stat_file=true" })
+			assert.is_true(opts.stat_file)
+		end)
+
+		it("is not an option key", function()
+			for k in pairs(opts) do
+				assert.are_not.equal("apply_args", k)
+			end
+		end)
+	end)
+
+	describe("pretty_dir and pretty_file", function()
+		local prettypath = require("prettypath")
+
+		it("return the formatted string", function()
+			local fmt = { format = "%icon%|%name%" }
+			local dir = prettypath.pretty_dir("/nonexistent/src", fmt)
+			local file = prettypath.pretty_file("/nonexistent/src", fmt)
+			assert.is_string(dir)
+			assert.is_string(file)
+			assert.is_truthy(strip(dir):match("|src$"))
+			assert.are.equal(prettypath.pretty_path("/nonexistent/src/", fmt), dir)
+			assert.are_not.equal(dir, file)
+		end)
+	end)
+
+	describe("compile_format.needs_stat", function()
+		local utils = require("prettypath.utils")
+
+		it("is set only by metadata tokens", function()
+			assert.is_nil(utils.compile_format("%path% %icon% %dir%%name% %score%").needs_stat)
+			for token in pairs(utils.stat_tokens) do
+				assert.is_true(utils.compile_format("%name% %" .. token .. "%").needs_stat, token)
+			end
+		end)
+	end)
+
+	describe("stats bookkeeping", function()
+		local prettypath = require("prettypath")
+		local opts = require("prettypath.opts")
+
+		after_each(function()
+			opts.output_stats = false
+			opts.stat_file = "auto"
+		end)
+
+		it("keeps no path lists without output_stats", function()
+			local unassigned, missing = #prettypath.stats.unassigned, #prettypath.stats.missing
+			opts.stat_file = true
+			prettypath.pretty_path("/nonexistent/x.zzunknown")
+			assert.are.equal(unassigned, #prettypath.stats.unassigned)
+			assert.are.equal(missing, #prettypath.stats.missing)
+		end)
+
+		it("collects unassigned and missing paths with output_stats", function()
+			local unassigned, missing = #prettypath.stats.unassigned, #prettypath.stats.missing
+			opts.output_stats = true
+			opts.stat_file = true
+			prettypath.pretty_path("/nonexistent/x.zzunknown")
+			assert.are.equal(unassigned + 1, #prettypath.stats.unassigned)
+			assert.are.equal(missing + 1, #prettypath.stats.missing)
+		end)
+	end)
+end)
+
+describe("rockspec", function()
+	it("installs every module in prettypath/", function()
+		local spec = io.open("prettypath-dev-4.rockspec"):read("*a")
+		for file in io.popen("ls prettypath/*.lua"):lines() do
+			local mod = file:match("^prettypath/(.+)%.lua$")
+			if mod ~= "test" then
+				assert.is_truthy(spec:find('["prettypath.' .. mod .. '"]', 1, true), mod .. " missing from rockspec")
+			end
+		end
 	end)
 end)

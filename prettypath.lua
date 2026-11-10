@@ -51,14 +51,27 @@ local function parse_path(line, path_type)
 	return { dir = dir, name = name, score = parse_score(score), path = pathname, type = path_type }
 end
 
-local pretty_path = function(path, user_opts, path_type)
-	-- print("pretty path called with path: " .. tostring(path) .. ", path_type: " .. tostring(path_type))
-	local pathinfo = parse_path(path, path_type)
+-- stat_file = "auto" stats only for formats with a metadata token (%size%, %mod%, ...)
+local function wants_stat(user_opts)
+	local stat_file = opts.stat_file
+	if stat_file == "auto" then
+		local fmt = (user_opts and user_opts.format) or opts.format
+		return utils.compile_format(fmt).needs_stat == true
+	end
+	return stat_file == true
+end
 
-	if opts.stat_file then
+local pretty_path = function(path, user_opts, path_type)
+	local pathinfo = parse_path(path, path_type)
+	-- the path lists are only reported by --output_stats; skip them otherwise (a long run would keep them all)
+	local collect = opts.output_stats == true
+
+	if wants_stat(user_opts) then
 		local filestat = utils.file_stat(pathinfo.path)
 		if filestat == nil then
-			table.insert(stats.missing, path)
+			if collect then
+				table.insert(stats.missing, path)
+			end
 			pathinfo.missing = true
 		else
 			stats.total = stats.total + 1
@@ -71,10 +84,9 @@ local pretty_path = function(path, user_opts, path_type)
 	end
 
 	pathinfo.icon_data = devicons.get(pathinfo.name, pathinfo.type)
-	if pathinfo.icon_data.name == "Default" then
+	if collect and pathinfo.icon_data.name == "Default" then
 		table.insert(stats.unassigned, path)
 	end
-	-- print("Path info: " .. utils.inspect(pathinfo))
 
 	local parsed_str = utils.format_path(pathinfo, user_opts)
 	return parsed_str
@@ -84,9 +96,9 @@ return {
 	stats = stats,
 	pretty_path = pretty_path,
 	pretty_dir = function(path, user_opts)
-		pretty_path(path, user_opts, "directory")
+		return pretty_path(path, user_opts, "directory")
 	end,
 	pretty_file = function(path, user_opts)
-		pretty_path(path, user_opts, "file")
+		return pretty_path(path, user_opts, "file")
 	end,
 }

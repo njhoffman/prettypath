@@ -13,7 +13,8 @@ local function cli(args, lines)
 	f:close()
 	local output = os.tmpname()
 	-- os.execute returns the raw status in Lua 5.1 (code * 256), (ok, "exit", code) in 5.2+
-	local r1, _, r3 = os.execute("lua bin/prettypath.lua " .. args .. " < " .. input .. " > " .. output .. " 2> " .. err)
+	local r1, _, r3 =
+		os.execute("env -u NO_COLOR lua bin/prettypath.lua " .. args .. " < " .. input .. " > " .. output .. " 2> " .. err)
 	local code = type(r1) == "number" and math.floor(r1 / 256) or r3
 	local out = {}
 	for line in io.lines(output) do
@@ -28,7 +29,7 @@ end
 
 -- raw CLI output (escapes kept) for one missing file
 local function raw(args)
-	local h = io.popen("echo /nonexistent/x.lua | lua bin/prettypath.lua " .. args)
+	local h = io.popen("echo /nonexistent/x.lua | env -u NO_COLOR lua bin/prettypath.lua " .. args)
 	local out = h:read("*a")
 	h:close()
 	return out

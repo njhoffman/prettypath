@@ -33,16 +33,16 @@ Reviewed: 2026-11-10
 
 ## 2. Interface for callers
 
-- [ ] **--base DIR** (p2) [feature]: drop a directory prefix from `%dir%` (shown relative to the base, as
+- [x] **--base DIR** (p2) [feature]: drop a directory prefix from `%dir%` (shown relative to the base, as
       `fd` and `rg` print). fzx strips `~/base/` from every display line with awk after prettypath.
-- [ ] **--dirs** (p2) [feature]: treat every input path as a directory (folder icon, directory colors),
+- [x] **--dirs** (p2) [feature]: treat every input path as a directory (folder icon, directory colors),
       for lists that do not end directories with "/" (zoxide, fasd, z.lua). fzx appends the slash with sed
       first today.
-- [ ] **Decorate one field of tabbed input** (p2) [feature]: `--field N` (with `--delimiter`, default tab)
+- [x] **Decorate one field of tabbed input** (p2) [feature]: `--field N` (with `--delimiter`, default tab)
       formats that field and passes the other fields through, so "score<TAB>path" or "id<TAB>path<TAB>extra"
       lines keep their columns. fzx's dirs and recent modules pipe the paths through prettypath separately
       and join the results back by path with awk.
-- [ ] **NO_COLOR and --color** (p2) [feature]: honor NO_COLOR and take `--color=always|never|auto` (auto:
+- [x] **NO_COLOR and --color** (p2) [feature]: honor NO_COLOR and take `--color=always|never|auto` (auto:
       color when stdout is a terminal); `force_256` in opts.lua is unused, so 256-color terminals get
       24-bit escapes.
 - [ ] **NUL-separated input** (p3) [feature]: `-0` / `--null` to read paths separated by NUL (`fd -0`,
@@ -52,6 +52,14 @@ Reviewed: 2026-11-10
 - [ ] **Capabilities in --version** (p3) [feature]: fzx probes each prettypath binary (by path and mtime)
       to learn whether "%" and paths directly under "/" survive; a version number callers can compare (or a
       `--features` line) would replace the probe.
+- [ ] **256-color output** (p3) [feature]: `force_256` in opts.lua is unused, so 256-color terminals get
+      24-bit escapes. Add `--color=256`: icons use their `cterm_color`, the hex colors in opts.colors map to
+      the nearest xterm-256 index (computed once per color, like the truecolor cache in color.lua).
+- [ ] **Unknown options are ignored** (p3) [bug]: `--colr=never` or `--feild=2` is silently dropped by
+      opts.apply_args. Reject any `--name` not in prettypath/cli.lua's option table, exit 2, as bad values do.
+- [ ] **zsh and fish completions are only syntax-checked** (p3) [test]: specs run `zsh -n` and drive the bash
+      completion function; zsh's `_arguments` behavior is untested and fish is not installed here. Add a
+      zpty-driven zsh check and a `fish --no-execute` one where fish exists.
 
 ## 3. Correctness and packaging
 
@@ -69,7 +77,7 @@ Reviewed: 2026-11-10
       `prettypath.opts` / `prettypath.utils` the library uses, so bin and library each have their own opts
       table and format cache. Harmless while both parse `arg`, but it breaks the moment only bin parses it.
       Require `prettypath.*` and put the script's parent directory on package.path (from arg[0]).
-- [ ] **Metadata tokens on missing or unstatted files** (p2) [bug]: `%size%` on a missing file raises in
+- [x] **Metadata tokens on missing or unstatted files** (p2) [bug]: `%size%` on a missing file raises in
       lua-filesize, so the whole line passes through unformatted; `%mod%` on a missing file prints the
       current time (os.date(nil)); `%mod_ago%` with stat off prints "57y ago" (epoch). Print "" (or "-")
       when the field is nil, in prettypath/format.lua.

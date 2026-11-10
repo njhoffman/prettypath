@@ -5,10 +5,25 @@ local hex2rgb = function(hex)
 	return tonumber("0x" .. hex:sub(1, 2)), tonumber("0x" .. hex:sub(3, 4)), tonumber("0x" .. hex:sub(5, 6))
 end
 
+-- opts.color: always, never, or auto (color only when stdout is a terminal; checked once)
+local stdout_tty
+local function color_on()
+	local mode = opts.color
+	if mode == "never" then
+		return false
+	elseif mode == "auto" then
+		if stdout_tty == nil then
+			stdout_tty = require("luv").guess_handle(1) == "tty"
+		end
+		return stdout_tty
+	end
+	return true
+end
+
 -- escape sequence per hex color, computed once
 local ansi_cache = {}
 local to_ansi = function(text, color)
-	if color == nil or text == nil or text == "" then
+	if color == nil or text == nil or text == "" or not color_on() then
 		return text
 	end
 	local ansi = ansi_cache[color]

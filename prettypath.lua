@@ -25,7 +25,33 @@ local function starts_with(str, prefix)
 	return prefix ~= "" and str:sub(1, #prefix) == prefix
 end
 
--- "path", "score path" (score before an absolute path), "path/" (a directory); absolute or relative
+-- opts.base as given ("~/x", "/x/", ...) -> the base path ("/home/me/x") and the prefix dropped from %dir%
+-- ("/home/me/x/"); nil when unset. Normalized once per value (opts.base may be set by a library caller).
+local cached_raw, cached_path, cached_prefix
+local function base_dir()
+	local raw = opts.base
+	if raw == nil or raw == "" then
+		return nil
+	end
+	if raw ~= cached_raw then
+		local b = raw
+		if home ~= "" and (b == "~" or starts_with(b, "~/")) then
+			b = home .. b:sub(2)
+		end
+		if #b > 1 then
+			b = b:gsub("/+$", "")
+			if b == "" then
+				b = "/"
+			end
+		end
+		cached_raw, cached_path = raw, b
+		cached_prefix = b == "/" and "/" or b .. "/"
+	end
+	return cached_path, cached_prefix
+end
+
+-- "path", "score path" (score before an absolute path), "path/" (a directory); absolute or relative.
+-- A directory under opts.base is shown relative to it, then a directory under HOME with "~".
 local function parse_path(line, path_type)
 	local score, pathname = line:match("^%s*(%d+%.?%d*)%s+(/.*)$")
 	pathname = pathname or line
@@ -45,6 +71,14 @@ local function parse_path(line, path_type)
 	if starts_with(dir, "./") then
 		dir = dir:sub(3)
 	end
+	local base, base_prefix = base_dir()
+	if base ~= nil then
+		if pathname == base then
+			dir = ""
+		elseif starts_with(dir, base_prefix) then
+			dir = dir:sub(#base_prefix + 1)
+		end
+	end
 	if home ~= "" and (dir == home .. "/" or starts_with(dir, home .. "/")) then
 		dir = opts.home_name .. dir:sub(#home + 1)
 	end
@@ -62,6 +96,9 @@ local function wants_stat(user_opts)
 end
 
 local pretty_path = function(path, user_opts, path_type)
+	if path_type == nil and opts.dirs == true then
+		path_type = "directory"
+	end
 	local pathinfo = parse_path(path, path_type)
 	-- the path lists are only reported by --output_stats; skip them otherwise (a long run would keep them all)
 	local collect = opts.output_stats == true
@@ -92,9 +129,41 @@ local pretty_path = function(path, user_opts, path_type)
 	return parsed_str
 end
 
+-- split on a literal delimiter (not a pattern); "" yields one empty field
+local function split_plain(line, delim)
+	local fields, pos = {}, 1
+	while true do
+		local s, e = line:find(delim, pos, true)
+		if s == nil then
+			fields[#fields + 1] = line:sub(pos)
+			return fields
+		end
+		fields[#fields + 1] = line:sub(pos, s - 1)
+		pos = e + 1
+	end
+end
+
+-- One input line: the whole line is the path, or with opts.field only that field of it (the other fields
+-- pass through, rejoined with opts.delimiter). A line without that field is returned unchanged.
+local pretty_line = function(line, user_opts)
+	local n = opts.field
+	if n == nil then
+		return pretty_path(line, user_opts)
+	end
+	local delim = opts.delimiter
+	local fields = split_plain(line, delim)
+	local i = n < 0 and #fields + n + 1 or n
+	if i < 1 or i > #fields then
+		return line
+	end
+	fields[i] = pretty_path(fields[i], user_opts)
+	return table.concat(fields, delim)
+end
+
 return {
 	stats = stats,
 	pretty_path = pretty_path,
+	pretty_line = pretty_line,
 	pretty_dir = function(path, user_opts)
 		return pretty_path(path, user_opts, "directory")
 	end,

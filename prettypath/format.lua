@@ -74,7 +74,13 @@ local time_ago = function(time, lang_format)
 
 end
 
+-- shown for a metadata token without data (a missing file, or --stat_file=false)
+local NONE = '-'
+
 local format_time = function(sec, ago)
+  if sec == nil then
+    return NONE
+  end
   if ago == true then
     return time_ago(sec)
   end
@@ -99,6 +105,9 @@ local format_time = function(sec, ago)
 end
 
 local format_size = function(bytes)
+  if bytes == nil then
+    return NONE
+  end
   return filesize(bytes)
 end
 

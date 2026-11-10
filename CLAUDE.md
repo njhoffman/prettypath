@@ -60,7 +60,10 @@ echo "/path/to/file.lua" | ./bin/prettypath_test.lua
 Main API returning `pretty_path(path, user_opts, path_type)`. Parses paths, optionally stats files via luv, retrieves icons from devicons module.
 
 ### Module Structure (`prettypath/`)
-- `opts.lua` - Configuration options, parses CLI args (`--format=`, `--stat_file=`, `--output_stats=`)
+- `opts.lua` - Configuration options; `opts.apply_args(argv)` applies CLI args (only bin calls it, so a library
+  `require` never reads the host's `arg`)
+- `cli.lua` - Option table that `--help` and `prettypath completion bash|zsh|fish` are generated from (add a
+  new option here and in `opts.apply_args`)
 - `devicons.lua` - Icon lookup by filename/extension, wraps iconmap
 - `iconmap.lua` - Base icon definitions (icon char, color, name) keyed by filename/extension
 - `override.lua` - Custom icon overrides merged into iconmap (primary customization point)

@@ -2,9 +2,34 @@
 
 All notable changes to prettypath are recorded here, in the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 format. Versions before semantic versioning were published only as luarocks dev rockspecs (dev-2 to dev-4)
-and were never tagged; their history is summarized under Unreleased.
+and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-11-10
+
+### Added
+- `--base=DIR` shows directories under DIR relative to it in `%dir%` (`~` and trailing slashes allowed);
+  `%path%` is unchanged.
+- `--dirs` treats every path as a directory, for lists that do not end directories with `/` (zoxide).
+- `--field=N` decorates one field of each line and passes the others through; `-1` is the last field, and a
+  line without field N is printed unchanged. `--delimiter=D` sets the separator (default tab; `\t` works
+  as typed). Library callers get the same through `pretty_line`.
+- `--color=always|never|auto` and `NO_COLOR`: `never` drops the color escapes but keeps the icons, `auto`
+  colors only when stdout is a terminal. The default stays `always` (prettypath usually feeds fzf through a
+  pipe), or `never` when `NO_COLOR` is set; an explicit `--color` wins.
+- `prettypath completion bash|zsh|fish` prints a completion script for options, their values and directories
+  for `--base`; `--help` says how to install each.
+- Flags can be given bare: `--dirs` is `--dirs=true`.
+
+### Changed
+- An invalid `--color`, `--field` or `--delimiter` fails up front with exit status 2, like an unknown format
+  token.
+
+### Fixed
+- `%size%`, `%mod%`, `%access%`, `%create%` and their `_ago` forms print `-` for a missing file or with
+  `--stat_file=false`. Before, `%size%` left the whole line unformatted, `%mod%` printed the current time
+  and `%mod_ago%` printed "57y ago".
 
 ## [0.1.0] - 2026-11-10
 

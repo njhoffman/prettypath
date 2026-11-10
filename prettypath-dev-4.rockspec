@@ -36,6 +36,7 @@ build = {
 			["bin.prettypath"] = "bin/prettypath.lua",
 			["bin.prettypath_test"] = "bin/prettypath_test.lua",
 			["prettypath"] = "prettypath.lua",
+			["prettypath.cli"] = "prettypath/cli.lua",
 			["prettypath.color"] = "prettypath/color.lua",
 			["prettypath.devicons"] = "prettypath/devicons.lua",
 			["prettypath.format"] = "prettypath/format.lua",

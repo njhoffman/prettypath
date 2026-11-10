@@ -55,13 +55,31 @@ end
 
 local prettypath = require("../prettypath")
 local opts = require("../prettypath/opts")
+local utils = require("../prettypath/utils")
+
+-- a bad format fails once, up front, instead of on every line
+local ok_format, format_err = pcall(utils.compile_format, opts.format)
+if not ok_format then
+	io.stderr:write("prettypath: " .. tostring(format_err) .. "\n")
+	os.exit(2)
+end
+
 local start_time = os.time()
-local stdin = io.stdin:lines()
-for line in stdin do
-	pcall(function()
-		-- allow pipe to be interrupted without error
-		io.write(prettypath.pretty_path(line) .. "\n")
-	end)
+local warned = false
+for line in io.stdin:lines() do
+	local ok, out = pcall(prettypath.pretty_path, line)
+	if not ok then
+		-- never drop a line: a consumer pairing output with input relies on one line per path
+		if not warned then
+			io.stderr:write("prettypath: " .. tostring(out) .. " (passed through unformatted: " .. line .. ")\n")
+			warned = true
+		end
+		out = line
+	end
+	-- a closed pipe (fzf exited, head) ends the run quietly
+	if not io.write(out, "\n") then
+		break
+	end
 end
 
 local stats = prettypath.stats or {}

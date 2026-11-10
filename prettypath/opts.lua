@@ -35,16 +35,20 @@ local opts = {
 
 opts = utils.deep_extend(default_opts, opts)
 
-for _, command_arg in ipairs(arg) do
-	for key in string.gmatch(command_arg, "--([a-z_]+)=") do
-		local val = command_arg:gsub("--" .. key .. "=", "")
-		if key == "format" and val ~= nil then
-			opts.format = val
-		elseif key == "stat_file" and val ~= nil then
-			opts.stat_file = val
-		elseif key == "output_stats" and val ~= nil then
-			opts.output_stats = val
-		end
+-- "true"/"false" from the command line; a plain "false" string would be truthy in Lua
+local function parse_bool(val)
+	val = tostring(val):lower()
+	return val == "true" or val == "1" or val == "yes" or val == "on"
+end
+
+for _, command_arg in ipairs(arg or {}) do
+	local key, val = command_arg:match("^%-%-([a-z_]+)=(.*)$")
+	if key == "format" then
+		opts.format = val
+	elseif key == "stat_file" then
+		opts.stat_file = parse_bool(val)
+	elseif key == "output_stats" then
+		opts.output_stats = parse_bool(val)
 	end
 end
 

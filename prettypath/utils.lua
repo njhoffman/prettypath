@@ -2,52 +2,52 @@ local uv = require("luv") -- "luv" when stand-alone, "uv" in luvi apps
 local format = require("prettypath.format")
 local inspect = require("prettypath.inspect")
 
-local parse_token = function(token, info)
+-- %token% -> function(pathinfo); built on first use (color requires opts, which requires this module)
+local token_formatters
+local function formatters()
+	if token_formatters then
+		return token_formatters
+	end
 	local color = require("prettypath.color")
-	local token_formatters = {
-		path = function(pathinfo)
-			return format.nop(pathinfo.path)
+	token_formatters = {
+		path = function(p)
+			return p.path
 		end,
-		score = function(pathinfo)
-			return color.score(pathinfo.score)
+		score = function(p)
+			return color.score(p.score)
 		end,
-		icon = function(pathinfo)
-			return color.icon(pathinfo.icon_data, pathinfo.missing)
+		icon = function(p)
+			return color.icon(p.icon_data, p.missing)
 		end,
-		dir = function(pathinfo)
-			return color.dir(pathinfo.dir, pathinfo.missing)
+		dir = function(p)
+			return color.dir(p.dir, p.missing)
 		end,
-		name = function(pathinfo)
-			return color.name(pathinfo.name, pathinfo.missing)
+		name = function(p)
+			return color.name(p.name, p.missing)
 		end,
-		size = function(pathinfo)
-			return format.size(pathinfo.size)
+		size = function(p)
+			return format.size(p.size)
 		end,
-		access = function(pathinfo)
-			return format.time(pathinfo.atime)
+		access = function(p)
+			return format.time(p.atime)
 		end,
-		mod = function(pathinfo)
-			return format.time(pathinfo.mtime)
+		mod = function(p)
+			return format.time(p.mtime)
 		end,
-		create = function(pathinfo)
-			return format.time(pathinfo.ctime)
+		create = function(p)
+			return format.time(p.ctime)
 		end,
-		access_ago = function(pathinfo)
-			return format.time(pathinfo.atime, true)
+		access_ago = function(p)
+			return format.time(p.atime, true)
 		end,
-		mod_ago = function(pathinfo)
-			return format.time(pathinfo.mtime, true)
+		mod_ago = function(p)
+			return format.time(p.mtime, true)
 		end,
-		create_ago = function(pathinfo)
-			return format.time(pathinfo.ctime, true)
+		create_ago = function(p)
+			return format.time(p.ctime, true)
 		end,
 	}
-
-	if token_formatters[token] == nil then
-		return error("Invalid configuration token: " .. token)
-	end
-	local token_str = token_formatters[token](info) or ""
-	return string.gsub(tostring(token_str), "%%", "")
+	return token_formatters
 end
 
 local M = {}
@@ -68,19 +68,54 @@ M.file_stat = function(path)
 	}
 end
 
+-- M.compile_format(fmt): the format as a list of literal strings and token functions, compiled once per
+-- format. Only %name% (lowercase letters and _) is a token; any other text, "%" included, is literal.
+-- An unknown token is an error.
+local compiled = {}
+M.compile_format = function(fmt)
+	if compiled[fmt] then
+		return compiled[fmt]
+	end
+	local fns = formatters()
+	local parts, pos = {}, 1
+	while true do
+		local s, e, token = fmt:find("%%([a-z_]+)%%", pos)
+		if s == nil then
+			break
+		end
+		if fns[token] == nil then
+			error("unknown format token %" .. token .. "%", 0)
+		end
+		if s > pos then
+			parts[#parts + 1] = fmt:sub(pos, s - 1)
+		end
+		parts[#parts + 1] = fns[token]
+		pos = e + 1
+	end
+	if pos <= #fmt then
+		parts[#parts + 1] = fmt:sub(pos)
+	end
+	compiled[fmt] = parts
+	return parts
+end
+
+-- token output is inserted as is (no gsub replacement strings, so "%" in a name survives)
 M.format_path = function(pathinfo, user_config)
 	local fmt = require("prettypath.opts").format
 	if user_config ~= nil and user_config.format ~= nil then
 		fmt = user_config.format
 	end
-	local str = fmt
-	local tokens = {}
-	for token in string.gmatch(fmt, "[a-z_]+") do
-		table.insert(tokens, token)
-		local token_str = parse_token(token, pathinfo) or ""
-		str = string.gsub(str, "%%" .. token .. "%%", token_str)
+	local parts = M.compile_format(fmt)
+	local out = {}
+	for i = 1, #parts do
+		local part = parts[i]
+		if type(part) == "string" then
+			out[i] = part
+		else
+			out[i] = tostring(part(pathinfo) or "")
+		end
 	end
-	return str
+	return table.concat(out)
 end
 
 M.deep_extend = function(t1, t2)

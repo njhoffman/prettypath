@@ -5,14 +5,19 @@ local hex2rgb = function(hex)
 	return tonumber("0x" .. hex:sub(1, 2)), tonumber("0x" .. hex:sub(3, 4)), tonumber("0x" .. hex:sub(5, 6))
 end
 
+-- escape sequence per hex color, computed once
+local ansi_cache = {}
 local to_ansi = function(text, color)
-	if color == nil then
+	if color == nil or text == nil or text == "" then
 		return text
 	end
-	local reset = "\27[0m"
-	local r, g, b = hex2rgb(color)
-	local ansi = "\27[38;2;" .. r .. ";" .. g .. ";" .. b .. "m"
-	return ansi .. text .. reset
+	local ansi = ansi_cache[color]
+	if ansi == nil then
+		local r, g, b = hex2rgb(color)
+		ansi = "\27[38;2;" .. r .. ";" .. g .. ";" .. b .. "m"
+		ansi_cache[color] = ansi
+	end
+	return ansi .. text .. "\27[0m"
 end
 
 local color_icon = function(icon_data, is_missing)

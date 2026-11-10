@@ -18,21 +18,37 @@ local function parse_score(score)
 	return string.format("%6.2f", score)
 end
 
-local function parse_path(path, path_type)
-	-- Try to match with score first (number followed by whitespace then path)
-	local score, pathname = path:match("^%s*(%d+%.?%d*)%s+(/.+)$")
-	pathname = pathname or path:match("^%s*(/.+)$")
-	pathname = string.gsub(pathname, "/$", "")
-	local dir = pathname:match("(.*[/\\])")
-	local pathinfo = { dir = dir, name = pathname, score = parse_score(score), path = pathname, type = path_type }
+local home = os.getenv("HOME") or ""
 
-	if pathinfo.dir ~= nil then
-		dir = string.gsub(dir, "^./", "")
-		pathinfo.dir = string.gsub(dir, os.getenv("HOME") or "", "~")
-		pathinfo.name = path:match("^.+/(.+)$")
+-- plain prefix test (no Lua patterns: paths are full of magic characters)
+local function starts_with(str, prefix)
+	return prefix ~= "" and str:sub(1, #prefix) == prefix
+end
+
+-- "path", "score path" (score before an absolute path), "path/" (a directory); absolute or relative
+local function parse_path(line, path_type)
+	local score, pathname = line:match("^%s*(%d+%.?%d*)%s+(/.*)$")
+	pathname = pathname or line
+	-- a trailing slash marks a directory (fd --type d, ls -p); "/" itself stays
+	if #pathname > 1 and pathname:sub(-1) == "/" then
+		pathname = pathname:gsub("/+$", "")
+		if pathname == "" then
+			pathname = "/"
+		end
+		path_type = path_type or "directory"
 	end
-
-	return pathinfo
+	local dir, name = pathname:match("^(.*/)([^/]+)$")
+	if dir == nil then
+		-- no slash (a relative name) or "/" itself
+		dir, name = "", pathname
+	end
+	if starts_with(dir, "./") then
+		dir = dir:sub(3)
+	end
+	if home ~= "" and (dir == home .. "/" or starts_with(dir, home .. "/")) then
+		dir = opts.home_name .. dir:sub(#home + 1)
+	end
+	return { dir = dir, name = name, score = parse_score(score), path = pathname, type = path_type }
 end
 
 local pretty_path = function(path, user_opts, path_type)

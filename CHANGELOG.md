@@ -6,6 +6,16 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.7.2] - 2026-11-10
+
+### Fixed
+- `$HOME` itself is shown as `~` (`%name%` "~", `%dir%` empty), as zoxide and fzx's dirs list it; it showed as
+  `/home/` and the user name. With `--base` set to `$HOME`, the base rule (its name) still wins.
+- An empty line (or empty `--field` field, or empty `-0` record) prints empty, instead of the default icon.
+- A score before a relative path (`3 src/a.lua`) is read when the format shows `%score%`; before, only a
+  score before an absolute path was. Without `%score%`, a name that starts with a number and a space
+  (`2024 report.pdf`) stays one name.
+
 ## [0.7.1] - 2026-11-10
 
 ### Added

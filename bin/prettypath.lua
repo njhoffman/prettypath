@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-local VERSION = "0.7.1"
+local VERSION = "0.7.2"
 
 local function print_version()
 	print("prettypath " .. VERSION)

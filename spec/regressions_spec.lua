@@ -260,3 +260,73 @@ describe("rockspec", function()
 		end
 	end)
 end)
+
+describe("follow-up fixes", function()
+	local prettypath = require("prettypath")
+	local opts = require("prettypath.opts")
+	local home = os.getenv("HOME")
+	local fmt = { format = "%dir%|%name%|%path%" }
+
+	describe("HOME itself", function()
+		after_each(function()
+			opts.base = nil
+			opts.home_name = "~"
+		end)
+
+		it("is shown as ~, with or without a trailing /", function()
+			assert.are.equal("|~|" .. home, strip(prettypath.pretty_path(home, fmt)))
+			assert.are.equal("|~|" .. home, strip(prettypath.pretty_path(home .. "/", fmt)))
+		end)
+
+		it("leaves paths under HOME as before", function()
+			assert.are.equal("~/|x.lua|" .. home .. "/x.lua", strip(prettypath.pretty_path(home .. "/x.lua", fmt)))
+			assert.are.equal("~/a/|b|" .. home .. "/a/b", strip(prettypath.pretty_path(home .. "/a/b", fmt)))
+		end)
+
+		it("follows home_name, and --base wins when HOME is the base", function()
+			opts.home_name = "H"
+			assert.are.equal("|H|" .. home, strip(prettypath.pretty_path(home, fmt)))
+			opts.home_name = "~"
+			opts.base = home
+			local name = home:match("([^/]+)$")
+			assert.are.equal("|" .. name .. "|" .. home, strip(prettypath.pretty_path(home, fmt)))
+		end)
+	end)
+
+	describe("empty input", function()
+		it("prints an empty line for an empty line, between others", function()
+			local out = cli("--format=%icon%%name%", { "/etc/hosts", "", "/etc/passwd" })
+			assert.are.equal(3, #out)
+			assert.are.equal("", out[2])
+			assert.are_not.equal("", out[1])
+		end)
+
+		it("returns an empty string from the library, and keeps an empty --field field empty", function()
+			assert.are.equal("", prettypath.pretty_path("", { format = "%icon%%name%" }))
+			assert.are.equal("", prettypath.pretty_dir("", { format = "%icon%%name%" }))
+			opts.field = 2
+			local out = prettypath.pretty_line("1\t", { format = "%icon%%name%" })
+			opts.field = nil
+			assert.are.equal("1\t", out)
+		end)
+	end)
+
+	describe("a score before a relative path", function()
+		local ranked = { format = "%score%|%path%" }
+
+		it("is read when the format shows %score%", function()
+			assert.are.equal(" 12.00|lib/x.lua", strip(prettypath.pretty_path("12 lib/x.lua", ranked)))
+			assert.are.equal("  3.50|README.md", strip(prettypath.pretty_path("  3.5 README.md", ranked)))
+		end)
+
+		it("is part of the name otherwise, so a name starting with a number stays whole", function()
+			assert.are.equal("2024 report.pdf", strip(prettypath.pretty_path("2024 report.pdf", { format = "%path%" })))
+			assert.are.equal("12 lib/x.lua", strip(prettypath.pretty_path("12 lib/x.lua", { format = "%path%" })))
+		end)
+
+		it("leaves a score before an absolute path read either way, as before", function()
+			assert.are.equal("  7.00|/etc/hosts", strip(prettypath.pretty_path("7 /etc/hosts", ranked)))
+			assert.are.equal("/etc/hosts", strip(prettypath.pretty_path("7 /etc/hosts", { format = "%path%" })))
+		end)
+	end)
+end)

@@ -50,10 +50,15 @@ local function base_dir()
 	return cached_path, cached_prefix
 end
 
--- "path", "score path" (score before an absolute path), "path/" (a directory); absolute or relative.
--- A directory under opts.base is shown relative to it, then a directory under HOME with "~".
-local function parse_path(line, path_type)
+-- "path", "score path", "path/" (a directory); absolute or relative. A score before an absolute path is
+-- always read; before a relative one only when ranked (the format shows %score%), so a file named
+-- "2024 report.pdf" stays one name otherwise. A directory under opts.base is shown relative to it, then a
+-- directory under HOME with "~"; HOME itself is shown as "~".
+local function parse_path(line, path_type, ranked)
 	local score, pathname = line:match("^%s*(%d+%.?%d*)%s+(/.*)$")
+	if score == nil and ranked then
+		score, pathname = line:match("^%s*(%d+%.?%d*)%s+(%S.*)$")
+	end
 	pathname = pathname or line
 	-- a trailing slash marks a directory (fd --type d, ls -p); "/" itself stays
 	if #pathname > 1 and pathname:sub(-1) == "/" then
@@ -81,29 +86,36 @@ local function parse_path(line, path_type)
 	end
 	if home ~= "" and (dir == home .. "/" or starts_with(dir, home .. "/")) then
 		dir = opts.home_name .. dir:sub(#home + 1)
+	elseif home ~= "" and pathname == home and not (base ~= nil and pathname == base) then
+		-- HOME itself (zoxide and fzx's dirs list it): "~", unless it is the --base, shown by its name
+		dir, name = "", opts.home_name
 	end
 	return { dir = dir, name = name, score = parse_score(score), path = pathname, type = path_type }
 end
 
 -- stat_file = "auto" stats only for formats with a metadata token (%size%, %mod%, ...)
-local function wants_stat(user_opts)
+local function wants_stat(parts)
 	local stat_file = opts.stat_file
 	if stat_file == "auto" then
-		local fmt = (user_opts and user_opts.format) or opts.format
-		return utils.compile_format(fmt).needs_stat == true
+		return parts.needs_stat == true
 	end
 	return stat_file == true
 end
 
 local pretty_path = function(path, user_opts, path_type)
+	-- an empty line (or field, or record) stays empty: no icon for no path
+	if path == "" then
+		return ""
+	end
 	if path_type == nil and opts.dirs == true then
 		path_type = "directory"
 	end
-	local pathinfo = parse_path(path, path_type)
+	local parts = utils.compile_format((user_opts and user_opts.format) or opts.format)
+	local pathinfo = parse_path(path, path_type, parts.needs_score)
 	-- the path lists are only reported by --output_stats; skip them otherwise (a long run would keep them all)
 	local collect = opts.output_stats == true
 
-	if wants_stat(user_opts) then
+	if wants_stat(parts) then
 		local filestat = utils.file_stat(pathinfo.path)
 		if filestat == nil then
 			if collect then

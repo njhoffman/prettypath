@@ -60,15 +60,16 @@ invalid value exits with status 2 and a message before any input is read.
 |---|---|
 | `%path%` | The path as given (a trailing `/` removed) |
 | `%icon%` | The icon, colored, with its trailing space |
-| `%dir%` | The directory part, colored; under `$HOME` it starts with `~`, under `--base` it is relative |
+| `%dir%` | The directory part, colored; under `$HOME` it starts with `~` (`$HOME` itself shows as `~`), under `--base` it is relative |
 | `%name%` | The file name, colored |
-| `%score%` | A score read from the start of the line (`12.5 /path`), for ranked lists |
+| `%score%` | A score read from the start of the line, for ranked lists: before an absolute path always (`12.5 /path`), before a relative one when the format shows `%score%` (`3 src/a.lua`) |
 | `%size%` | File size, human-readable |
 | `%access%`, `%mod%`, `%create%` | Access, modification and change times |
 | `%access_ago%`, `%mod_ago%`, `%create_ago%` | The same times, relative (`3h ago`) |
 
 Only `%name%`-shaped tokens are read; other text, `%` included, is printed as is. The size and date tokens
-print `-` for a missing file or with `--stat_file=false`. A trailing `/` marks a directory.
+print `-` for a missing file or with `--stat_file=false`. A trailing `/` marks a directory, and an empty line
+stays empty.
 
 ### Examples
 

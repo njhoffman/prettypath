@@ -70,7 +70,8 @@ end
 
 -- M.compile_format(fmt): the format as a list of literal strings and token functions, compiled once per
 -- format. Only %name% (lowercase letters and _) is a token; any other text, "%" included, is literal.
--- An unknown token is an error. parts.needs_stat is true when a token reads file metadata.
+-- An unknown token is an error. parts.needs_stat is true when a token reads file metadata, parts.needs_score
+-- when the format shows %score%.
 local stat_tokens = {
 	size = true,
 	access = true,
@@ -102,6 +103,8 @@ M.compile_format = function(fmt)
 		parts[#parts + 1] = fns[token]
 		if stat_tokens[token] then
 			parts.needs_stat = true
+		elseif token == "score" then
+			parts.needs_score = true
 		end
 		pos = e + 1
 	end

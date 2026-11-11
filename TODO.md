@@ -15,14 +15,14 @@ Reviewed: 2026-11-10
 
 ## 5. Follow-ups
 
-- [ ] **$HOME itself is not shown as ~** (p3) [bug]: `/home/me` (or `/home/me/`) prints `%dir%` "/home/" and
+- [x] **$HOME itself is not shown as ~** (p3) [bug]: `/home/me` (or `/home/me/`) prints `%dir%` "/home/" and
       `%name%` "me"; parse_path in prettypath.lua only replaces HOME as a prefix of the directory part, so
       the home directory itself (zoxide and fzx dirs list it) never becomes "~". Map a path equal to HOME
       to `%dir%` "" and `%name%` "~" (or the home_name option).
-- [ ] **An empty line gets an icon** (p3) [bug]: an empty input line prints the default icon and an empty
+- [x] **An empty line gets an icon** (p3) [bug]: an empty input line prints the default icon and an empty
       name instead of an empty line (`printf '\n' | prettypath` gives "<icon> "). Pass empty lines (and
       empty `--field` fields, `-0` records) through unchanged, as a line without the field already is.
-- [ ] **A score before a relative path is not read** (p3) [bug]: "12 lib/x.lua" is taken as one path
+- [x] **A score before a relative path is not read** (p3) [bug]: "12 lib/x.lua" is taken as one path
       ("12 lib/x.lua", score 0); the score pattern in parse_path requires an absolute path after it. Accept
       any path after the number, or document %score% as absolute-only. With `--field`, the score column
       is not visible to %score% at all; a `--score_field=N` would cover ranked tabbed input.

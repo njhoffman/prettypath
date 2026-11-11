@@ -33,21 +33,24 @@ format:
 format-check:
 	stylua --check bin/*.lua prettypath/*.lua spec/*.lua
 
-# Testing
+# Testing. The specs (and the CLI they run) load luv and lua-filesize from the user's luarocks tree:
+# put its paths in the environment first, so a plain shell needs no `eval "$(luarocks path)"`.
+LUAROCKS_ENV = eval "$$(luarocks --local path 2> /dev/null)" && export LUA_PATH LUA_CPATH &&
+
 test:
-	busted
+	$(LUAROCKS_ENV) busted
 
 test-unit:
-	busted --exclude-tags=integration
+	$(LUAROCKS_ENV) busted --exclude-tags=integration
 
 test-watch:
-	busted --watch
+	$(LUAROCKS_ENV) busted --watch
 
 test-verbose:
-	busted --verbose
+	$(LUAROCKS_ENV) busted --verbose
 
 test-coverage:
-	busted --coverage && luacov
+	$(LUAROCKS_ENV) busted --coverage && luacov
 
 $(ROCKSPEC): rockspec.in
 	sed -e "s/_VERSION/$(VERSION)/g; s/_REVISION/$(REVISION)/g" $< > $@

@@ -1,6 +1,10 @@
-local icons =
+-- Icon overrides, merged over iconmap.lua (devicons.override). Three tables, applied in order:
+--   icons:   overrides generated from nvim-web-devicons and friends
+--   custom:  hand-picked entries; applied after icons, so they win over a generated entry for the same key
+--   aliases: extension or name -> the key of an existing entry whose icon and color it reuses (resolved
+--            last, against the merged table), for types without an icon of their own
+local custom =
   {
-    --- custom icons ---
     ['rockspec'] = {
       icon = '',
       color = '#f34436',
@@ -123,7 +127,18 @@ local icons =
       name = 'Zsh',
     },
     -- .jq, bz2, rst, README.*, .so, .lang, .cache
-    --- override icons ---
+
+    -- color schemes (no generated entry has a palette icon)
+    ['itermcolors'] = { icon = '󰏘', color = '#c678dd', cterm_color = '176', name = 'Colorscheme' },
+    ['colors'] = { icon = '󰏘', color = '#c678dd', cterm_color = '176', name = 'Colorscheme' },
+    ['colorscheme'] = { icon = '󰏘', color = '#c678dd', cterm_color = '176', name = 'Colorscheme' },
+    ['termcolors'] = { icon = '󰏘', color = '#c678dd', cterm_color = '176', name = 'Colorscheme' },
+    ['xrdb'] = { icon = '󰏘', color = '#c678dd', cterm_color = '176', name = 'Colorscheme' },
+    ['theme'] = { icon = '󰏘', color = '#c678dd', cterm_color = '176', name = 'Colorscheme' },
+  }
+
+local icons =
+  {
     Brewfile = {
       color = '#701516',
       cterm_color = '1',
@@ -2104,6 +2119,48 @@ local icons =
     -- }
   }
 
+-- unassigned in a 280k-file listing of ~/ghq and ~/.config (2026-11-10), by count; each reuses the icon of
+-- a type of the same kind
+local aliases = {
+  -- object files and libraries
+  ['o'] = 'bin',
+  ['a'] = 'lib',
+  ['so'] = 'dll',
+  -- build files (automake: .am, .in, .Po)
+  ['make'] = 'cmake',
+  ['mk'] = 'cmake',
+  ['am'] = 'cmake',
+  ['in'] = 'cmake',
+  ['Po'] = 'cmake',
+  -- build and test outputs
+  ['out'] = 'log',
+  ['timestamp'] = 'log',
+  -- config formats (rofi themes: .rasi)
+  ['properties'] = 'conf',
+  ['config'] = 'conf',
+  ['rasi'] = 'conf',
+  ['reg'] = 'ini',
+  -- translations
+  ['po'] = 'pot',
+  -- editor snippets and settings (XML or JSON)
+  ['sublime-snippet'] = 'xml',
+  ['sublime-completions'] = 'xml',
+  ['tmPreferences'] = 'xml',
+  -- binary data
+  ['msgpack'] = 'db',
+  ['parquet'] = 'db',
+  ['rmeta'] = 'db',
+  ['.gitkeep'] = '.gitignore',
+  ['cheat'] = 'md',
+  ['bats'] = 'bash',
+}
+
+-- custom over icons: a hand-picked entry wins
+for k, v in pairs(custom) do
+  icons[k] = v
+end
+
 return {
   icons = icons,
+  aliases = aliases,
 }

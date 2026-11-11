@@ -84,7 +84,9 @@ Used in `--format=` option:
 - `%access_ago%`, `%mod_ago%`, `%create_ago%` - Relative timestamps
 
 ### Icon Customization
-To add/override icons, edit `prettypath/override.lua`. Icon entries:
+To add/override icons, edit `prettypath/override.lua`: hand-picked entries go in its `custom` table (applied
+after the generated `icons`, so they win), and a type that should reuse an existing icon goes in `aliases`
+(`['ext'] = 'donor-key'`). spec/override_spec.lua fails on a repeated key. Icon entries:
 ```lua
 ['extension'] = {
   icon = '',      -- Nerd Font glyph

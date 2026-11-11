@@ -176,7 +176,10 @@ local function zsh()
 			local action = o.values and ("(" .. words(o.values) .. ")") or (o.complete == "dir" and "_files -/" or " ")
 			specs[#specs + 1] = ("    '--%s=[%s]:%s:%s'"):format(o.name, desc, o.arg:lower(), action)
 		elseif o.short then
-			specs[#specs + 1] = ("    '(- *)'{-%s,--%s}'[%s]'"):format(o.short, o.name, desc)
+			-- help and version end the command ("(- *)": nothing else after them); other short aliases
+			-- (-0) only exclude their own long form
+			local excl = (o.name == "help" or o.name == "version") and "(- *)" or ("(-%s --%s)"):format(o.short, o.name)
+			specs[#specs + 1] = ("    '%s'{-%s,--%s}'[%s]'"):format(excl, o.short, o.name, desc)
 		else
 			specs[#specs + 1] = ("    '--%s[%s]'"):format(o.name, desc)
 		end

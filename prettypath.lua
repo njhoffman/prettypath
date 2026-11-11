@@ -3,7 +3,7 @@ local opts = require("prettypath.opts")
 local utils = require("prettypath.utils")
 
 local overriden = require("prettypath.override")
-devicons.override(overriden.icons)
+devicons.override(overriden.icons, nil, overriden.aliases)
 
 local stats = {
 	unassigned = {},

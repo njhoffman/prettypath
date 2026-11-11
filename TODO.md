@@ -65,7 +65,7 @@ Reviewed: 2026-11-10
       the nearest xterm-256 index (computed once per color, like the truecolor cache in color.lua).
 - [x] **Unknown options are ignored** (p3) [bug]: `--colr=never` or `--feild=2` is silently dropped by
       opts.apply_args. Reject any `--name` not in prettypath/cli.lua's option table, exit 2, as bad values do.
-- [ ] **zsh and fish completions are only syntax-checked** (p3) [test]: specs run `zsh -n` and drive the bash
+- [x] **zsh and fish completions are only syntax-checked** (p3) [test]: specs run `zsh -n` and drive the bash
       completion function; zsh's `_arguments` behavior is untested and fish is not installed here. Add a
       zpty-driven zsh check and a `fish --no-execute` one where fish exists.
 
@@ -78,7 +78,7 @@ Reviewed: 2026-11-10
 - [x] **Rockspec misses modules** (p2) [bug]: override_materialicons and override_webicons are not listed,
       so a luarocks install lacks them.
 - [x] **cli_spec expects dev-3** (p3) [test]: the version test still checks the old rockspec version.
-- [ ] **Unassigned icons report** (p3) [chore]: run --output_stats over a large real listing (~/ghq, ~/.config)
+- [x] **Unassigned icons report** (p3) [chore]: run --output_stats over a large real listing (~/ghq, ~/.config)
       and add icons for the most common unassigned names and extensions.
 - [x] **bin loads a second copy of each module** (p2) [bug]: bin/prettypath.lua requires `"../prettypath"`,
       `"../prettypath/opts"` and `"../prettypath/utils"`; Lua caches those under different names than the
@@ -97,7 +97,7 @@ Reviewed: 2026-11-10
       `color_name ~= false`, before the missing check, and carries a TODO about a 1-100 scale that
       opts.lua documents but nothing implements (default_opts.color_name = 0 is overridden by false).
       Decide what color_name means and drop the dead branch.
-- [ ] **Custom icons in override.lua are overwritten** (p3) [bug]: the hand-picked entries at the top of
+- [x] **Custom icons in override.lua are overwritten** (p3) [bug]: the hand-picked entries at the top of
       override.lua's icons table (mp3, wav, `Gemfile$`, zip, tar) are defined again further down the same
       table literal, and the later entry wins (luacheck W314), so the custom icons and colors never apply.
       Keep one entry per key: move the custom ones after the generated block, or into their own table merged last.
@@ -108,10 +108,12 @@ Reviewed: 2026-11-10
       `directory_icon`, which is never defined (nil); override_materialicons.lua and override_webicons.lua
       build their tables but return nothing, so `require` gives `true`; nonicons.lua has an unused
       generate_icons with unreachable code. Return the tables (or drop the modules) so luacheck is clean.
+      Also override.lua's `Gemfile$` keys (custom and generated): icon lookup is by exact name, so a key
+      with a literal "$" never matches `Gemfile`.
 
 ## 4. Tooling and docs
 
-- [ ] **Tests need luarocks paths in the environment** (p3) [test]: `make test` fails with "module 'luv'
+- [x] **Tests need luarocks paths in the environment** (p3) [test]: `make test` fails with "module 'luv'
       not found" unless the shell has `eval "$(luarocks --local path)"`; busted and the CLI specs run plain
       `lua`. Have the Makefile test targets set LUA_PATH/LUA_CPATH from `luarocks path`.
 - [ ] **Makefile is mostly dead lunamark targets** (p3) [chore]: ROCKSPEC/rockspec.in/REVISION, bench (Markdown

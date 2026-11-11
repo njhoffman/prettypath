@@ -6,6 +6,22 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-11-10
+
+### Added
+- Icons for common types that had none, found by `--output_stats` over a 280k-file listing: object files and
+  libraries (`.o`, `.a`, `.so`), automake and make files (`.am`, `.in`, `.Po`, `.make`, `.mk`), build output
+  (`.out`, `.timestamp`), config formats (`.properties`, `.config`, `.rasi`, `.reg`), translations (`.po`),
+  Sublime/TextMate snippets, binary data (`.msgpack`, `.parquet`, `.rmeta`), `.gitkeep`, `.cheat`, `.bats`,
+  and a palette icon for color schemes (`.itermcolors`, `.colors`, `.colorscheme`, `.termcolors`, `.xrdb`,
+  `.theme`). Each reuses the icon of a type of the same kind.
+
+### Fixed
+- The hand-picked icons in override.lua (mp3, wav, zip, tar) are used again; generated entries for the same
+  keys had replaced them.
+- zsh completion offers the other options after `-0` (it treated `-0` like `--help`, which ends the command).
+- `make test` works in a plain shell: the test targets load the luarocks paths themselves.
+
 ## [0.5.0] - 2026-11-10
 
 ### Added

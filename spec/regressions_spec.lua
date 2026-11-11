@@ -173,7 +173,7 @@ describe("library use", function()
 		end)
 
 		it("parses format, stat_file (auto/bool) and output_stats", function()
-			opts.apply_args({ "--format=%name%", "--stat_file=AUTO", "--output_stats=yes", "positional" })
+			opts.apply_args({ "--format=%name%", "--stat_file=AUTO", "--output_stats=yes" })
 			assert.are.equal("%name%", opts.format)
 			assert.are.equal("auto", opts.stat_file)
 			assert.is_true(opts.output_stats)

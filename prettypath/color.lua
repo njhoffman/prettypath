@@ -49,16 +49,14 @@ local color_icon = function(icon_data, is_missing)
 	end
 end
 
+-- color_name = false prints the name plain; otherwise path_name, or the missing color for a missing file
 local color_name = function(name, is_missing)
-	if opts.color_name ~= false then
-		-- TODO: colorize name from 1-100
+	if opts.color_name == false then
 		return name
 	elseif is_missing then
 		return to_ansi(name, opts.colors.missing)
-	elseif opts.colors.path_name ~= nil then
-		return to_ansi(name, opts.colors.path_name)
 	end
-	return name
+	return to_ansi(name, opts.colors.path_name)
 end
 
 local color_dir = function(dirname, is_missing)

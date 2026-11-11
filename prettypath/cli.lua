@@ -32,6 +32,10 @@ M.options = {
 		'Field separator for --field, taken literally; "\\t" is a',
 		"tab (default: tab)",
 	} },
+	{ name = "line-buffered", desc = {
+		"Flush after every line (fzf on a slow source shows rows as",
+		"they come; output is block-buffered otherwise)",
+	} },
 	{ name = "color", arg = "MODE", values = { "always", "never", "auto" }, desc = {
 		"always, never or auto (only when stdout is a terminal);",
 		"icons are kept either way (default: always, or never",

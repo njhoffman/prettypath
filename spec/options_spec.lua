@@ -279,3 +279,133 @@ describe("bare flags", function()
 		assert.is_true(got)
 	end)
 end)
+
+describe("argument checking", function()
+	local function rejects(args, pattern)
+		local out, err, code = cli(args, { "/etc/hosts" })
+		assert.are.equal("", out, args)
+		assert.is_truthy(err:match(pattern), args .. ": " .. err)
+		assert.are.equal(2, code, args)
+	end
+
+	it("rejects unknown long and short options", function()
+		rejects("--colr=never", "unknown option '%-%-colr'")
+		rejects("--nope", "unknown option '%-%-nope'")
+		rejects("-x", "unknown option '%-x'")
+	end)
+
+	it("rejects stray arguments, since paths come on stdin", function()
+		rejects("foo.lua", "unexpected argument 'foo.lua'.*stdin")
+		rejects("-", "unexpected argument '%-'")
+		rejects("''", "unexpected argument ''")
+	end)
+
+	it("rejects a bare option that needs a value", function()
+		rejects("--format", "%-%-format needs a value")
+		rejects("--field", "%-%-field needs a value")
+		rejects("--stat_file", "%-%-stat_file needs a value")
+	end)
+
+	it("rejects a boolean that is not one", function()
+		rejects("--dirs=x", "%-%-dirs takes true or false")
+		rejects("--output_stats=maybe", "%-%-output_stats takes true or false")
+		rejects("--stat_file=sometimes", "%-%-stat_file takes auto, true or false")
+	end)
+
+	it("takes - and _ alike in option names", function()
+		local a = cli("--stat-file=false --line-buffered --color=never --format=%name%", { "/etc/hosts" })
+		local b = cli("--stat_file=false --line_buffered --color=never --format=%name%", { "/etc/hosts" })
+		assert.are.equal("hosts\n", a)
+		assert.are.equal(a, b)
+	end)
+
+	it("accepts every option in the help table", function()
+		local opts = require("prettypath.opts")
+		local saved = {}
+		for k, v in pairs(opts) do
+			saved[k] = v
+		end
+		for _, o in ipairs(require("prettypath.cli").options) do
+			if o.name ~= "help" and o.name ~= "version" then
+				local val = o.values and o.values[1] or (o.arg == "N" and "1") or (o.arg and "x")
+				local a = "--" .. o.name .. (val and ("=" .. val) or "")
+				assert.has_no.errors(function()
+					opts.apply_args({ a })
+				end, a)
+			end
+		end
+		for k, v in pairs(saved) do
+			opts[k] = v
+		end
+	end)
+end)
+
+describe("--line-buffered", function()
+	-- ms from start until the first output line, with the second input line 1s behind the first
+	local function first_line_ms(args)
+		local script = "s=$(date +%s%N); (echo /etc/hosts; sleep 1; echo /etc/passwd)"
+			.. " | env -u NO_COLOR lua bin/prettypath.lua "
+			.. args
+			.. " --format=%name% | { IFS= read -r l; e=$(date +%s%N); cat > /dev/null; echo $(((e - s) / 1000000)); }"
+		local out = run("bash -c " .. sh_quote(script))
+		return tonumber(out)
+	end
+
+	it("sends each line as it is made, not when the input ends", function()
+		assert.is_true(first_line_ms("--line-buffered") < 800)
+		assert.is_true(first_line_ms("") >= 950)
+	end)
+end)
+
+describe("--output_stats", function()
+	it("reports on stderr, leaving stdout to the paths", function()
+		local out, err = cli("--output_stats --color=never --format=%name%", { "/etc/hosts", "/x/y.zzz" })
+		assert.are.equal("hosts\ny.zzz\n", out)
+		assert.is_truthy(err:match("Total:%s+2"))
+		assert.is_truthy(err:match("Unassigned:%s+2"))
+		assert.is_truthy(err:match("Average:%s+[%d.]+μs"))
+	end)
+
+	it("prints - instead of nan on empty input", function()
+		local out, err, code = run("printf '' | env -u NO_COLOR lua bin/prettypath.lua --output_stats")
+		assert.are.equal("", out)
+		assert.are.equal(0, code)
+		assert.is_falsy(err:match("nan"))
+		assert.is_truthy(err:match("Percentage:%s+%-"))
+		assert.is_truthy(err:match("Average:%s+%-"))
+	end)
+end)
+
+describe("color_name", function()
+	local color = require("prettypath.color")
+	local opts = require("prettypath.opts")
+
+	after_each(function()
+		opts.color_name = true
+		opts.color = "always"
+	end)
+
+	it("colors the name, with the missing color for a missing file", function()
+		local name = color.name("a.lua", false)
+		local missing = color.name("a.lua", true)
+		assert.are_not.equal("a.lua", name)
+		assert.is_truthy(missing:find(color.icon({ icon = "" }, true):match("^\27%[[%d;]*m"), 1, true))
+		assert.are_not.equal(name, missing)
+	end)
+
+	it("prints the name plain with color_name = false, missing or not", function()
+		opts.color_name = false
+		assert.are.equal("a.lua", color.name("a.lua", false))
+		assert.are.equal("a.lua", color.name("a.lua", true))
+	end)
+
+	it("dims a missing file's name from the command line", function()
+		local missing = cli("--stat_file=true --format=%name%", { "/nonexistent/a.lua" })
+		local present = cli("--stat_file=true --format=%name%", { "/etc/hosts" })
+		local esc = function(s)
+			return s:match("^(\27%[[%d;]*m)")
+		end
+		assert.is_truthy(esc(missing))
+		assert.are_not.equal(esc(present), esc(missing))
+	end)
+end)

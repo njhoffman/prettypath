@@ -6,6 +6,25 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-11-10
+
+### Added
+- `--line-buffered` sends each line as soon as it is made, so fzf on a slow source shows rows as they come.
+- Option names take `-` and `_` alike (`--stat-file`, `--output-stats`).
+
+### Changed
+- An unknown option (`--colr=never`, `-x`), a stray argument (`prettypath *.lua`; paths come on stdin), a bare
+  option that needs a value (`--format`) and a boolean that is not one (`--dirs=x`) now fail with exit status 2
+  and a message, instead of being ignored or read as false.
+- `--output_stats` writes its report to stderr, so `prettypath --output_stats | fzf` gets only the paths, and
+  times the run in microseconds instead of whole seconds.
+- `color_name` in opts.lua is a plain boolean like `color_icon`: true (the default, same output as before)
+  colors the name, false prints it plain. The unimplemented 0-100 scale is gone.
+
+### Fixed
+- `--output_stats` on empty input prints `-` for the percentage and average instead of `nan`.
+- A missing file's name gets the missing color whenever names are colored.
+
 ## [0.3.0] - 2026-11-10
 
 ### Added

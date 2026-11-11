@@ -8,6 +8,8 @@ Measured 2026-10-26 (lua 5.1 through the luarocks wrapper): 28ms to start, 13-30
 and directory list (`fzx -m files`, `dirs`, `recent`), so the per-path cost sets how fast big lists appear.
 `make bench` (bench/bench.sh; `LUA=luajit` to compare) reports startup and µs per path, in CPU time, on a
 fixed generated list; its header shows the load average, since even CPU time varies 2x on a busy machine.
+Under luajit all modules load in about 4 ms (iconmap and override about 2 of it; the override_*icons sets are
+never loaded) and luv adds nothing measurable, so lazy loading the icon tables was dropped (2026-11-10).
 
 Reviewed: 2026-11-10
 
@@ -30,13 +32,10 @@ Reviewed: 2026-11-10
 - [x] **Start faster** (p3) [perf]: the luarocks wrapper loads `luarocks.loader` before the script; calling
       lua5.1 directly with the same package paths started 20-55ms sooner in three (noisy) runs. Done: the
       `make install` launcher sets the module paths itself and skips luarocks.loader.
-- [ ] **Load icon tables lazily** (p3) [perf]: startup loads all of iconmap.lua and override.lua (and
-      nonicons through override_nonicons when used) before the first line. Measure their share of the
-      launcher's startup with `make bench`; load the override_*icons sets only when configured.
 - [x] **Benchmark target** (p3) [test]: `make bench` over a fixed list (say 20k paths with mixed
       extensions, directories and missing files), reporting startup and µs per path with stat on and off, so
       changes show their cost.
-- [ ] **Flush policy** (p3) [perf]: output is block-buffered, which is right for throughput; a
+- [x] **Flush policy** (p3) [perf]: output is block-buffered, which is right for throughput; a
       `--line-buffered` flag for interactive consumers that want the first rows at once (fzf shows the first
       screen sooner on a slow source).
 
@@ -64,7 +63,7 @@ Reviewed: 2026-11-10
 - [ ] **256-color output** (p3) [feature]: `force_256` in opts.lua is unused, so 256-color terminals get
       24-bit escapes. Add `--color=256`: icons use their `cterm_color`, the hex colors in opts.colors map to
       the nearest xterm-256 index (computed once per color, like the truecolor cache in color.lua).
-- [ ] **Unknown options are ignored** (p3) [bug]: `--colr=never` or `--feild=2` is silently dropped by
+- [x] **Unknown options are ignored** (p3) [bug]: `--colr=never` or `--feild=2` is silently dropped by
       opts.apply_args. Reject any `--name` not in prettypath/cli.lua's option table, exit 2, as bad values do.
 - [ ] **zsh and fish completions are only syntax-checked** (p3) [test]: specs run `zsh -n` and drive the bash
       completion function; zsh's `_arguments` behavior is untested and fish is not installed here. Add a
@@ -90,14 +89,22 @@ Reviewed: 2026-11-10
       lua-filesize, so the whole line passes through unformatted; `%mod%` on a missing file prints the
       current time (os.date(nil)); `%mod_ago%` with stat off prints "57y ago" (epoch). Print "" (or "-")
       when the field is nil, in prettypath/format.lua.
-- [ ] **--output_stats on empty input prints nan** (p3) [bug]: Percentage and Average divide by
+- [x] **--output_stats on empty input prints nan** (p3) [bug]: Percentage and Average divide by
       stats.total = 0; elapsed time comes from os.time() (1s resolution), so Average is 0 on most runs.
       Guard the zero case and time with os.clock() or uv.hrtime(). Stats also go to stdout, mixed into the
       data; stderr would keep pipelines clean.
-- [ ] **Name colors ignore missing** (p3) [bug]: color.lua's color_name returns the name uncolored when
+- [x] **Name colors ignore missing** (p3) [bug]: color.lua's color_name returns the name uncolored when
       `color_name ~= false`, before the missing check, and carries a TODO about a 1-100 scale that
       opts.lua documents but nothing implements (default_opts.color_name = 0 is overridden by false).
       Decide what color_name means and drop the dead branch.
+- [ ] **Custom icons in override.lua are overwritten** (p3) [bug]: the hand-picked entries at the top of
+      override.lua's icons table (mp3, wav, `Gemfile$`, zip, tar) are defined again further down the same
+      table literal, and the later entry wins (luacheck W314), so the custom icons and colors never apply.
+      Keep one entry per key: move the custom ones after the generated block, or into their own table merged last.
+- [ ] **Icon data modules: dead code and missing returns** (p3) [chore]: iconmap.lua exports
+      `directory_icon`, which is never defined (nil); override_materialicons.lua and override_webicons.lua
+      build their tables but return nothing, so `require` gives `true`; nonicons.lua has an unused
+      generate_icons with unreachable code. Return the tables (or drop the modules) so luacheck is clean.
 
 ## 4. Tooling and docs
 

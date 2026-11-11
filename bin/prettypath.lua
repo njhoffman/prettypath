@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-local VERSION = "0.3.0"
+local VERSION = "0.4.0"
 
 local function print_version()
 	print("prettypath " .. VERSION)
@@ -52,7 +52,12 @@ if not (ok_args and ok_format) then
 	os.exit(2)
 end
 
-local start_time = os.time()
+if opts.line_buffered == true then
+	io.stdout:setvbuf("line")
+end
+
+local uv = require("luv")
+local start_ns = uv.hrtime()
 local warned = false
 for line in io.stdin:lines() do
 	local ok, out = pcall(prettypath.pretty_line, line)
@@ -70,24 +75,30 @@ for line in io.stdin:lines() do
 	end
 end
 
-local stats = prettypath.stats or {}
-
-local elapsed_time = os.difftime(os.time(), start_time)
-
-if tostring(opts.output_stats) == "true" then
-	print("\n------\n")
-	for _, path in pairs(stats.unassigned) do
-		print(path)
+-- the report goes to stderr, so a pipeline (prettypath --output_stats | fzf) keeps only the paths
+if opts.output_stats == true then
+	local stats = prettypath.stats
+	local elapsed_us = (uv.hrtime() - start_ns) / 1000
+	local total, unassigned, missing = stats.total, #stats.unassigned, #stats.missing
+	local err = io.stderr
+	err:write("\n------\n\n")
+	for _, path in ipairs(stats.unassigned) do
+		err:write(path, "\n")
 	end
-
-	local avg = elapsed_time / stats.total * 1000000
-
-  --stylua: ignore
-  print(
-    '\n\n' .. 'Missing:\t' .. #stats.missing ..
-    '\n' .. 'Unassigned:\t' .. #stats.unassigned ..
-    '\n' .. 'Total:\t\t' .. stats.total ..
-    '\n' .. 'Percentage:\t' .. math.floor(100 - (#stats.unassigned / stats.total * 100)) .. '%' ..
-    '\n' .. 'Average:\t' .. (math.floor(avg * 100) / 100) .. 'μs' ..
-    '\n')
+	-- no paths: no percentage or average (they would divide by zero)
+	local percentage = total > 0 and (math.floor(100 - unassigned / total * 100) .. "%") or "-"
+	local average = total > 0 and string.format("%.2fμs", elapsed_us / total) or "-"
+	err:write(
+		"\n\nMissing:\t",
+		missing,
+		"\nUnassigned:\t",
+		unassigned,
+		"\nTotal:\t\t",
+		total,
+		"\nPercentage:\t",
+		percentage,
+		"\nAverage:\t",
+		average,
+		"\n\n"
+	)
 end

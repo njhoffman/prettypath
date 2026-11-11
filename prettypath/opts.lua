@@ -7,10 +7,8 @@ local default_opts = {
     date  = '#556789',
     size  = '#957769',
   },
-  -- size, access, mod, create, access_ago, mod_ago, create_ago
+  -- unused until 256-color output (TODO.md)
   force_256   = false,
-  color_icons = true,
-  color_name  = 0,
 }
 
 --stylua: ignore
@@ -27,9 +25,9 @@ local opts = {
   -- format       = "%path% %icon% %dir%%name%",
   stat_file    = "auto",
   home_name    = "~",
-  -- 0 (false) - 100 (true)
+  -- color the icon and the name (false: print them plain; a missing file's icon is still dimmed)
   color_icon   = true,
-  color_name   = false,
+  color_name   = true,
   output_stats = false,
   -- always | never | auto (only when stdout is a terminal); NO_COLOR (non-empty) makes the default never
   color        = "always",
@@ -40,6 +38,8 @@ local opts = {
   -- format only this field of each line (1-based; negative counts from the end), split on delimiter
   field        = nil,
   delimiter    = "\t",
+  -- flush after every line (for a consumer that shows rows as they come, on a slow source)
+  line_buffered = false,
 }
 
 local no_color = os.getenv("NO_COLOR")
@@ -50,29 +50,71 @@ end
 opts = utils.deep_extend(default_opts, opts)
 
 -- "true"/"false" from the command line; a plain "false" string would be truthy in Lua
-local function parse_bool(val)
-	val = tostring(val):lower()
-	return val == "true" or val == "1" or val == "yes" or val == "on"
+local bools =
+	{ ["true"] = true, ["1"] = true, yes = true, on = true, ["false"] = false, ["0"] = false, no = false, off = false }
+local function parse_bool(val, name)
+	local b = bools[tostring(val):lower()]
+	if b == nil then
+		error("--" .. (name or "option") .. " takes true or false, not '" .. tostring(val) .. "'", 0)
+	end
+	return b
 end
 
 -- stat_file: "auto" (stat only when the format has a metadata token), true or false
 local function parse_stat(val)
-	if tostring(val):lower() == "auto" then
+	val = tostring(val):lower()
+	if val == "auto" then
 		return "auto"
 	end
-	return parse_bool(val)
+	local b = bools[val]
+	if b == nil then
+		error("--stat_file takes auto, true or false, not '" .. val .. "'", 0)
+	end
+	return b
 end
 
 local color_modes = { always = true, never = true, auto = true }
 
+-- the options prettypath/cli.lua describes, by key ("-" and "_" are the same in a name): the arg
+-- placeholder, or false for a flag without a value
+local known
+local function known_options()
+	if known == nil then
+		known = {}
+		for _, o in ipairs(require("prettypath.cli").options) do
+			known[(o.name:gsub("%-", "_"))] = o.arg or false
+		end
+	end
+	return known
+end
+
 -- Apply --key=value (or a bare --flag, meaning true) command-line arguments. Only bin/prettypath.lua
 -- calls this: a library caller's global `arg` belongs to the host program, not to prettypath.
--- An invalid value is an error (the CLI reports it and exits 2).
+-- An unknown option, a stray argument or an invalid value is an error (the CLI reports it, exits 2).
 local function apply_args(argv)
+	local options = known_options()
 	for _, command_arg in ipairs(argv or {}) do
-		local key, val = command_arg:match("^%-%-([a-z_]+)=(.*)$")
-		if key == nil then
-			key = command_arg:match("^%-%-([a-z_]+)$")
+		local name, val = command_arg:match("^%-%-([%w_%-]+)=(.*)$")
+		if name == nil then
+			name = command_arg:match("^%-%-([%w_%-]+)$")
+			val = nil
+		end
+		if name == nil then
+			if command_arg:sub(1, 1) == "-" and command_arg ~= "-" then
+				error("unknown option '" .. command_arg .. "' (see --help)", 0)
+			end
+			error("unexpected argument '" .. command_arg .. "': prettypath reads paths from stdin (see --help)", 0)
+		end
+		local key = name:gsub("%-", "_")
+		local takes = options[key]
+		if takes == nil then
+			error("unknown option '--" .. name .. "' (see --help)", 0)
+		end
+		if val == nil then
+			-- a bare flag means true; an option that takes a value needs one
+			if takes and takes ~= "BOOL" then
+				error("--" .. name .. " needs a value (--" .. name .. "=" .. takes .. ")", 0)
+			end
 			val = "true"
 		end
 		if key == "format" then
@@ -80,9 +122,9 @@ local function apply_args(argv)
 		elseif key == "stat_file" then
 			opts.stat_file = parse_stat(val)
 		elseif key == "output_stats" then
-			opts.output_stats = parse_bool(val)
+			opts.output_stats = parse_bool(val, name)
 		elseif key == "dirs" then
-			opts.dirs = parse_bool(val)
+			opts.dirs = parse_bool(val, name)
 		elseif key == "base" then
 			opts.base = val ~= "" and val or nil
 		elseif key == "color" then
@@ -104,6 +146,8 @@ local function apply_args(argv)
 				error("--delimiter cannot be empty", 0)
 			end
 			opts.delimiter = val
+		elseif key == "line_buffered" then
+			opts.line_buffered = parse_bool(val, name)
 		end
 	end
 	return opts

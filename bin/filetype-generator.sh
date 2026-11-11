@@ -49,7 +49,9 @@ function main() {
     fi
     touch "./$file"
     local ft
-    ft="$("$NVIM" -u NORC --noplugin --headless "./$file" +'lua
+    # -u NONE and `filetype on`: filetype detection only. -u NORC still ran the filetype plugins (and the
+    # user's after/ftplugin), which fail noisily (ruby.vim probes for a ruby provider) and slow every run.
+    ft="$("$NVIM" -u NONE -i NONE --noplugin --headless --cmd 'filetype on' "./$file" +'lua
       local ok, err = pcall(vim.fn.writefile, { vim.bo.filetype }, "/dev/stdout")
       if not ok then
         print(err .. "\n")

@@ -7,8 +7,6 @@ local default_opts = {
     date  = '#556789',
     size  = '#957769',
   },
-  -- unused until 256-color output (TODO.md)
-  force_256   = false,
 }
 
 --stylua: ignore
@@ -29,7 +27,8 @@ local opts = {
   color_icon   = true,
   color_name   = true,
   output_stats = false,
-  -- always | never | auto (only when stdout is a terminal); NO_COLOR (non-empty) makes the default never
+  -- always | never | auto (only when stdout is a terminal) | 256 (xterm-256 escapes instead of truecolor);
+  -- NO_COLOR (non-empty) makes the default never
   color        = "always",
   -- drop this directory prefix from %dir% (nil: none)
   base         = nil,
@@ -40,6 +39,8 @@ local opts = {
   delimiter    = "\t",
   -- flush after every line (for a consumer that shows rows as they come, on a slow source)
   line_buffered = false,
+  -- records separated by NUL instead of newline, in and out
+  null         = false,
 }
 
 local no_color = os.getenv("NO_COLOR")
@@ -73,31 +74,39 @@ local function parse_stat(val)
 	return b
 end
 
-local color_modes = { always = true, never = true, auto = true }
+local color_modes = { always = true, never = true, auto = true, ["256"] = true }
 
 -- the options prettypath/cli.lua describes, by key ("-" and "_" are the same in a name): the arg
 -- placeholder, or false for a flag without a value
-local known
+local known, shorts
 local function known_options()
 	if known == nil then
-		known = {}
+		known, shorts = {}, {}
 		for _, o in ipairs(require("prettypath.cli").options) do
-			known[(o.name:gsub("%-", "_"))] = o.arg or false
+			local key = o.name:gsub("%-", "_")
+			known[key] = o.arg or false
+			if o.short then
+				shorts[o.short] = o.name
+			end
 		end
 	end
-	return known
+	return known, shorts
 end
 
 -- Apply --key=value (or a bare --flag, meaning true) command-line arguments. Only bin/prettypath.lua
 -- calls this: a library caller's global `arg` belongs to the host program, not to prettypath.
 -- An unknown option, a stray argument or an invalid value is an error (the CLI reports it, exits 2).
 local function apply_args(argv)
-	local options = known_options()
+	local options, short_names = known_options()
 	for _, command_arg in ipairs(argv or {}) do
 		local name, val = command_arg:match("^%-%-([%w_%-]+)=(.*)$")
 		if name == nil then
 			name = command_arg:match("^%-%-([%w_%-]+)$")
 			val = nil
+		end
+		-- a short alias of a flag: -0 is --null
+		if name == nil and short_names[command_arg:match("^%-(%w)$") or ""] then
+			name = short_names[command_arg:sub(2)]
 		end
 		if name == nil then
 			if command_arg:sub(1, 1) == "-" and command_arg ~= "-" then
@@ -130,7 +139,7 @@ local function apply_args(argv)
 		elseif key == "color" then
 			val = val:lower()
 			if not color_modes[val] then
-				error("--color takes always, never or auto, not '" .. val .. "'", 0)
+				error("--color takes always, never, auto or 256, not '" .. val .. "'", 0)
 			end
 			opts.color = val
 		elseif key == "field" then
@@ -148,6 +157,8 @@ local function apply_args(argv)
 			opts.delimiter = val
 		elseif key == "line_buffered" then
 			opts.line_buffered = parse_bool(val, name)
+		elseif key == "null" then
+			opts.null = parse_bool(val, name)
 		end
 	end
 	return opts

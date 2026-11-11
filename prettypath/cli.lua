@@ -36,10 +36,15 @@ M.options = {
 		"Flush after every line (fzf on a slow source shows rows as",
 		"they come; output is block-buffered otherwise)",
 	} },
-	{ name = "color", arg = "MODE", values = { "always", "never", "auto" }, desc = {
-		"always, never or auto (only when stdout is a terminal);",
-		"icons are kept either way (default: always, or never",
-		"when NO_COLOR is set)",
+	{ name = "null", short = "0", desc = {
+		"Paths are separated by NUL, in and out (fd -0, find -print0;",
+		"fzf --read0), for names with newlines",
+	} },
+	{ name = "color", arg = "MODE", values = { "always", "never", "auto", "256" }, desc = {
+		"always, never, auto (only when stdout is a terminal) or 256",
+		"(xterm-256 colors, for terminals without truecolor); icons",
+		"are kept either way (default: always, or never when NO_COLOR",
+		"is set)",
 	} },
 }
 
@@ -66,6 +71,10 @@ Examples:
   fd . "$PWD" | prettypath --base="$PWD"
   zoxide query -l | prettypath --dirs
   printf '3\t/etc/hosts\n' | prettypath --field=2
+
+Version:
+  --version prints "prettypath X.Y.Z" (semantic versioning, since 0.1.0); callers
+  compare it to check for a feature (CHANGELOG.md lists what each version added).
 
 Shell completion:
   bash: eval "$(prettypath completion bash)"        (in ~/.bashrc)

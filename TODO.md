@@ -53,14 +53,14 @@ Reviewed: 2026-11-10
 - [x] **NO_COLOR and --color** (p2) [feature]: honor NO_COLOR and take `--color=always|never|auto` (auto:
       color when stdout is a terminal); `force_256` in opts.lua is unused, so 256-color terminals get
       24-bit escapes.
-- [ ] **NUL-separated input** (p3) [feature]: `-0` / `--null` to read paths separated by NUL (`fd -0`,
+- [x] **NUL-separated input** (p3) [feature]: `-0` / `--null` to read paths separated by NUL (`fd -0`,
       `find -print0`), for names with newlines.
-- [ ] **Stat-based directory detection** (p3) [feature]: when stat runs anyway, mark directories from it,
+- [x] **Stat-based directory detection** (p3) [feature]: when stat runs anyway, mark directories from it,
       not only from a trailing "/".
-- [ ] **Capabilities in --version** (p3) [feature]: fzx probes each prettypath binary (by path and mtime)
+- [x] **Capabilities in --version** (p3) [feature]: fzx probes each prettypath binary (by path and mtime)
       to learn whether "%" and paths directly under "/" survive; a version number callers can compare (or a
       `--features` line) would replace the probe.
-- [ ] **256-color output** (p3) [feature]: `force_256` in opts.lua is unused, so 256-color terminals get
+- [x] **256-color output** (p3) [feature]: `force_256` in opts.lua is unused, so 256-color terminals get
       24-bit escapes. Add `--color=256`: icons use their `cterm_color`, the hex colors in opts.colors map to
       the nearest xterm-256 index (computed once per color, like the truecolor cache in color.lua).
 - [x] **Unknown options are ignored** (p3) [bug]: `--colr=never` or `--feild=2` is silently dropped by
@@ -101,6 +101,9 @@ Reviewed: 2026-11-10
       override.lua's icons table (mp3, wav, `Gemfile$`, zip, tar) are defined again further down the same
       table literal, and the later entry wins (luacheck W314), so the custom icons and colors never apply.
       Keep one entry per key: move the custom ones after the generated block, or into their own table merged last.
+- [ ] **make format rewrites the icon data files** (p3) [chore]: `make format` (stylua on prettypath/*.lua)
+      reformats iconmap.lua, override*.lua, nonicons.lua and inspect.lua, thousands of lines of generated or
+      vendored data. Add a .styluaignore for them (or narrow the Makefile globs) so a format run touches code only.
 - [ ] **Icon data modules: dead code and missing returns** (p3) [chore]: iconmap.lua exports
       `directory_icon`, which is never defined (nil); override_materialicons.lua and override_webicons.lua
       build their tables but return nothing, so `require` gives `true`; nonicons.lua has an unused

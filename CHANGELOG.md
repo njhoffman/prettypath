@@ -6,6 +6,25 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-10
+
+### Added
+- `-0` / `--null` reads and writes NUL-separated records (`fd -0`, `find -print0`, `fzf --read0`), for names
+  with newlines. A last record without a NUL counts.
+- When a file is statted anyway (`--stat_file=true`, or a size or date token), a directory gets the folder
+  icon and directory colors without a trailing `/`; a symlink to a directory counts as one.
+- `--color=256` prints xterm-256 escapes for terminals without truecolor: each icon's curated 256-color
+  value, and the nearest match for other colors. The default stays truecolor.
+- `--help` documents the `--version` output (`prettypath X.Y.Z`, semantic versioning since 0.1.0) as what
+  callers compare to check for a feature.
+
+### Fixed
+- With a stat, an explicit type (`--dirs`, `pretty_file`) is no longer replaced by the file's stat type.
+- `--line-buffered` flushes after every record, which also covers NUL-ended ones.
+
+### Removed
+- The unused `force_256` option in opts.lua (`--color=256` replaces it).
+
 ## [0.4.0] - 2026-11-10
 
 ### Added

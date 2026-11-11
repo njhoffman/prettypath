@@ -113,7 +113,14 @@ local pretty_path = function(path, user_opts, path_type)
 		else
 			stats.total = stats.total + 1
 			for name, val in pairs(filestat) do
-				pathinfo[name] = val
+				if name ~= "type" then
+					pathinfo[name] = val
+				end
+			end
+			-- the stat marks a directory the input did not (no trailing "/"); an explicit type wins
+			pathinfo.stat_type = filestat.type
+			if pathinfo.type == nil and filestat.type == "directory" then
+				pathinfo.type = "directory"
 			end
 		end
 	else

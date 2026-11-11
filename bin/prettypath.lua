@@ -1,6 +1,6 @@
 #!/usr/bin/env lua
 
-local VERSION = "0.4.0"
+local VERSION = "0.5.0"
 
 local function print_version()
 	print("prettypath " .. VERSION)
@@ -52,17 +52,50 @@ if not (ok_args and ok_format) then
 	os.exit(2)
 end
 
-if opts.line_buffered == true then
-	io.stdout:setvbuf("line")
+-- input records: lines, or with --null NUL-separated records (a last one without a NUL counts)
+local function records()
+	if opts.null ~= true then
+		return io.stdin:lines()
+	end
+	local buf, pos, done = "", 1, false
+	return function()
+		while true do
+			local nul = buf:find("\0", pos, true)
+			if nul then
+				local rec = buf:sub(pos, nul - 1)
+				pos = nul + 1
+				return rec
+			end
+			if done then
+				if pos <= #buf then
+					local rec = buf:sub(pos)
+					pos = #buf + 1
+					return rec
+				end
+				return nil
+			end
+			local chunk = io.stdin:read(65536)
+			if chunk == nil then
+				done = true
+			else
+				buf = buf:sub(pos) .. chunk
+				pos = 1
+			end
+		end
+	end
 end
+
+local sep = opts.null == true and "\0" or "\n"
+-- --line-buffered flushes after every record (stdio's line buffering would miss NUL-ended ones)
+local flush = opts.line_buffered == true
 
 local uv = require("luv")
 local start_ns = uv.hrtime()
 local warned = false
-for line in io.stdin:lines() do
+for line in records() do
 	local ok, out = pcall(prettypath.pretty_line, line)
 	if not ok then
-		-- never drop a line: a consumer pairing output with input relies on one line per path
+		-- never drop a record: a consumer pairing output with input relies on one record per path
 		if not warned then
 			io.stderr:write("prettypath: " .. tostring(out) .. " (passed through unformatted: " .. line .. ")\n")
 			warned = true
@@ -70,7 +103,7 @@ for line in io.stdin:lines() do
 		out = line
 	end
 	-- a closed pipe (fzf exited, head) ends the run quietly
-	if not io.write(out, "\n") then
+	if not io.write(out, sep) or (flush and not io.stdout:flush()) then
 		break
 	end
 end

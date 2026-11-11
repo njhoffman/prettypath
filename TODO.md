@@ -13,51 +13,6 @@ never loaded) and luv adds nothing measurable, so lazy loading the icon tables w
 
 Reviewed: 2026-11-10
 
-## 5. Follow-ups
-
-- [x] **$HOME itself is not shown as ~** (p3) [bug]: `/home/me` (or `/home/me/`) prints `%dir%` "/home/" and
-      `%name%` "me"; parse_path in prettypath.lua only replaces HOME as a prefix of the directory part, so
-      the home directory itself (zoxide and fzx dirs list it) never becomes "~". Map a path equal to HOME
-      to `%dir%` "" and `%name%` "~" (or the home_name option).
-- [x] **An empty line gets an icon** (p3) [bug]: an empty input line prints the default icon and an empty
-      name instead of an empty line (`printf '\n' | prettypath` gives "<icon> "). Pass empty lines (and
-      empty `--field` fields, `-0` records) through unchanged, as a line without the field already is.
-- [x] **A score before a relative path is not read** (p3) [bug]: "12 lib/x.lua" is taken as one path
-      ("12 lib/x.lua", score 0); the score pattern in parse_path requires an absolute path after it. Accept
-      any path after the number, or document %score% as absolute-only. With `--field`, the score column
-      is not visible to %score% at all; a `--score_field=N` would cover ranked tabbed input.
-- [x] **opts.colors.date and opts.colors.size are unused** (p3) [refactor]: opts.lua defines colors for the
-      date and size tokens, but format.lua prints them plain. Color them (through color.lua, so
-      --color=never and 256 apply) or drop the two options.
-- [x] **filetype-generator.sh fetches from the old devicons URL** (p3) [chore]: bin/filetype-generator.sh
-      curled one file of the old kyazdani42/nvim-web-devicons, which now keeps its tables in several modules,
-      and ran /usr/bin/nvim. Updated 2026-11-10: it clones nvim-tree/nvim-web-devicons (DEVICONS_REPO), reads
-      the icon names in a headless nvim (NVIM) and fetches 732 names. Left: a full run (one nvim per name,
-      a few minutes) to compare its filetypes table with iconmap.lua's before the next icon refresh. Done
-      2026-11-10: the full run works (170 filetypes; detection now `-u NONE` + `filetype on`, since
-      `-u NORC` ran ftplugins and the user's after/ftplugin); the comparison is the next item.
-- [x] **iconmap.lua's filetypes table is stale and partly wrong** (p3) [bug]: it backs only the library's
-      `devicons.get_by_filetype(ft)` (the CLI never reads it). Against bin/filetype-generator.sh's output
-      (2026-11-10, current nvim-web-devicons): 85 of its 160 entries agree, 2 map to the wrong icon (`fortran`
-      to "f#", the F# icon; `cobol` to a name the generator lists as cbl/cob/cpy), 73 keys are not vim
-      filetypes at all (`Brewfile`, `png`, `jpg`, `LICENSE`, `Gemfile` -> "Gemfile$", ...), and 83 current
-      filetypes are missing (`gitignore`, `jsonc`, `terraform-vars`, `typst`, `just`, `po`, ...). Rebuild it
-      from the generator (one icon name per filetype: the first that has an icon), and update the
-      iconmap and devicons specs that pin today's entries.
-- [x] **CLI specs only run under lua 5.1** (p3) [test]: the specs that spawn the CLI call `lua
-      bin/prettypath.lua`, so `busted --lua=luajit` runs only the library specs under luajit, while the
-      installed launcher runs the CLI under luajit. Take the interpreter from an env var (LUA, as bench.sh
-      does) and add `make test-luajit`.
-- [x] **No CI** (p3) [chore]: nothing runs `make check test` on a push. A GitHub Actions workflow with lua 5.1
-      and luajit (luarocks install luv lua-filesize busted luacheck, stylua from its release) would catch a
-      broken push the way the local suite does.
-- [x] **Time format is fixed** (p3) [feature]: `%mod%` and friends print `os.date("%x %X")`, locale-dependent
-      and not configurable. A `--time_format=STRFTIME` option (default unchanged) would let callers line
-      up columns or use ISO dates.
-- [x] **Broken symlinks look like missing files** (p3) [feature]: with a stat, a symlink whose target is gone
-      fails fs_stat and is dimmed as missing, same as a path that does not exist. fs_lstat on failure would
-      tell them apart (a broken-link icon or color), for listings like `find -L`.
-
 ## Completed
 
 ### 1. Speed (completed 2026-11-10)
@@ -174,3 +129,48 @@ Reviewed: 2026-11-10
       at a repo with no README. Add one with install, options, tokens and icon overrides.
 - [x] **No LICENSE file** (p3) [docs]: the rockspec and README say MIT, but the repo has no LICENSE, which
       the MIT terms expect alongside the code. Add one with the copyright holder and year.
+
+### 5. Follow-ups (completed 2026-11-10)
+
+- [x] **$HOME itself is not shown as ~** (p3) [bug]: `/home/me` (or `/home/me/`) prints `%dir%` "/home/" and
+      `%name%` "me"; parse_path in prettypath.lua only replaces HOME as a prefix of the directory part, so
+      the home directory itself (zoxide and fzx dirs list it) never becomes "~". Map a path equal to HOME
+      to `%dir%` "" and `%name%` "~" (or the home_name option).
+- [x] **An empty line gets an icon** (p3) [bug]: an empty input line prints the default icon and an empty
+      name instead of an empty line (`printf '\n' | prettypath` gives "<icon> "). Pass empty lines (and
+      empty `--field` fields, `-0` records) through unchanged, as a line without the field already is.
+- [x] **A score before a relative path is not read** (p3) [bug]: "12 lib/x.lua" is taken as one path
+      ("12 lib/x.lua", score 0); the score pattern in parse_path requires an absolute path after it. Accept
+      any path after the number, or document %score% as absolute-only. With `--field`, the score column
+      is not visible to %score% at all; a `--score_field=N` would cover ranked tabbed input.
+- [x] **opts.colors.date and opts.colors.size are unused** (p3) [refactor]: opts.lua defines colors for the
+      date and size tokens, but format.lua prints them plain. Color them (through color.lua, so
+      --color=never and 256 apply) or drop the two options.
+- [x] **filetype-generator.sh fetches from the old devicons URL** (p3) [chore]: bin/filetype-generator.sh
+      curled one file of the old kyazdani42/nvim-web-devicons, which now keeps its tables in several modules,
+      and ran /usr/bin/nvim. Updated 2026-11-10: it clones nvim-tree/nvim-web-devicons (DEVICONS_REPO), reads
+      the icon names in a headless nvim (NVIM) and fetches 732 names. Left: a full run (one nvim per name,
+      a few minutes) to compare its filetypes table with iconmap.lua's before the next icon refresh. Done
+      2026-11-10: the full run works (170 filetypes; detection now `-u NONE` + `filetype on`, since
+      `-u NORC` ran ftplugins and the user's after/ftplugin); the comparison is the next item.
+- [x] **iconmap.lua's filetypes table is stale and partly wrong** (p3) [bug]: it backs only the library's
+      `devicons.get_by_filetype(ft)` (the CLI never reads it). Against bin/filetype-generator.sh's output
+      (2026-11-10, current nvim-web-devicons): 85 of its 160 entries agree, 2 map to the wrong icon (`fortran`
+      to "f#", the F# icon; `cobol` to a name the generator lists as cbl/cob/cpy), 73 keys are not vim
+      filetypes at all (`Brewfile`, `png`, `jpg`, `LICENSE`, `Gemfile` -> "Gemfile$", ...), and 83 current
+      filetypes are missing (`gitignore`, `jsonc`, `terraform-vars`, `typst`, `just`, `po`, ...). Rebuild it
+      from the generator (one icon name per filetype: the first that has an icon), and update the
+      iconmap and devicons specs that pin today's entries.
+- [x] **CLI specs only run under lua 5.1** (p3) [test]: the specs that spawn the CLI call `lua
+      bin/prettypath.lua`, so `busted --lua=luajit` runs only the library specs under luajit, while the
+      installed launcher runs the CLI under luajit. Take the interpreter from an env var (LUA, as bench.sh
+      does) and add `make test-luajit`.
+- [x] **No CI** (p3) [chore]: nothing runs `make check test` on a push. A GitHub Actions workflow with lua 5.1
+      and luajit (luarocks install luv lua-filesize busted luacheck, stylua from its release) would catch a
+      broken push the way the local suite does.
+- [x] **Time format is fixed** (p3) [feature]: `%mod%` and friends print `os.date("%x %X")`, locale-dependent
+      and not configurable. A `--time_format=STRFTIME` option (default unchanged) would let callers line
+      up columns or use ISO dates.
+- [x] **Broken symlinks look like missing files** (p3) [feature]: with a stat, a symlink whose target is gone
+      fails fs_stat and is dimmed as missing, same as a path that does not exist. fs_lstat on failure would
+      tell them apart (a broken-link icon or color), for listings like `find -L`.

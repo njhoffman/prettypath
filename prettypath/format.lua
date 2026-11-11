@@ -92,7 +92,8 @@ end
 -- shown for a metadata token without data (a missing file, or --stat_file=false)
 local NONE = "-"
 
-local format_time = function(sec, ago)
+-- sec: a time; ago: relative ("3h ago"); fmt: an os.date format for an absolute time (default "%x %X")
+local format_time = function(sec, ago, fmt)
 	if sec == nil then
 		return NONE
 	end
@@ -116,7 +117,7 @@ local format_time = function(sec, ago)
 	-- %X	time (e.g., 23:48:10)
 	-- %Y	full year (1998)
 	-- %y	two-digit year (98) [00-99]
-	return os.date("%x %X", sec)
+	return os.date(fmt or "%x %X", sec)
 end
 
 local format_size = function(bytes)

@@ -45,7 +45,7 @@ describe("zsh completion", function()
 		os.remove(dir)
 		-- in a subshell: run() redirects the command's own stdout
 		local zfile = sh_quote(dir .. "/_prettypath")
-		run("(mkdir -p " .. sh_quote(dir) .. " && lua bin/prettypath.lua completion zsh > " .. zfile .. ")")
+		run("(mkdir -p " .. sh_quote(dir) .. " && ${LUA:-lua} bin/prettypath.lua completion zsh > " .. zfile .. ")")
 		assert.is_truthy(io.open(dir .. "/_prettypath"):read("*a"):match("^#compdef prettypath"))
 	end)
 
@@ -115,7 +115,7 @@ describe("fish completion", function()
 
 	setup(function()
 		script = os.tmpname()
-		run("(lua bin/prettypath.lua completion fish > " .. sh_quote(script) .. ")")
+		run("(${LUA:-lua} bin/prettypath.lua completion fish > " .. sh_quote(script) .. ")")
 		assert.is_truthy(io.open(script):read("*a"):match("^# fish completion"))
 	end)
 

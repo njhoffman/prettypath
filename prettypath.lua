@@ -13,6 +13,9 @@ local stats = {
 	config = opts,
 }
 
+-- the icon for a symlink whose target is gone (nf-md-link_variant_off)
+local broken_link = { icon = "󰌺", color = "#334455", cterm_color = "238", name = "BrokenLink" }
+
 local function parse_score(score)
 	score = tonumber(score) or 0
 	return string.format("%6.2f", score)
@@ -116,12 +119,13 @@ local pretty_path = function(path, user_opts, path_type)
 	local collect = opts.output_stats == true
 
 	if wants_stat(parts) then
-		local filestat = utils.file_stat(pathinfo.path)
+		local filestat, broken = utils.file_stat(pathinfo.path)
 		if filestat == nil then
 			if collect then
 				table.insert(stats.missing, path)
 			end
 			pathinfo.missing = true
+			pathinfo.broken = broken
 		else
 			stats.total = stats.total + 1
 			for name, val in pairs(filestat) do
@@ -139,7 +143,8 @@ local pretty_path = function(path, user_opts, path_type)
 		stats.total = stats.total + 1
 	end
 
-	pathinfo.icon_data = devicons.get(pathinfo.name, pathinfo.type)
+	-- a broken symlink gets its own icon (drawn in the missing color, like any missing path)
+	pathinfo.icon_data = pathinfo.broken and broken_link or devicons.get(pathinfo.name, pathinfo.type)
 	if collect and pathinfo.icon_data.name == "Default" then
 		table.insert(stats.unassigned, path)
 	end

@@ -36,6 +36,10 @@ M.options = {
 		"Flush after every line (fzf on a slow source shows rows as",
 		"they come; output is block-buffered otherwise)",
 	} },
+	{ name = "time_format", arg = "FORMAT", desc = {
+		"strftime format for %access%, %mod% and %create%",
+		'(default: "%x %X", the locale\'s date and time)',
+	} },
 	{ name = "null", short = "0", desc = {
 		"Paths are separated by NUL, in and out (fd -0, find -print0;",
 		"fzf --read0), for names with newlines",

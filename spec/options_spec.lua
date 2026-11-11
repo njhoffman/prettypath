@@ -29,7 +29,7 @@ end
 
 -- the CLI with NO_COLOR cleared (the caller's environment must not change the result)
 local function cli(args, lines, env)
-	return run("env -u NO_COLOR " .. (env or "") .. " lua bin/prettypath.lua " .. args, lines)
+	return run("env -u NO_COLOR " .. (env or "") .. " ${LUA:-lua} bin/prettypath.lua " .. args, lines)
 end
 
 local function out_lines(s)
@@ -232,7 +232,7 @@ describe("help and completion", function()
 				pending(shell .. " not installed")
 				return
 			end
-			local _, err, code = run("lua bin/prettypath.lua completion " .. shell .. " | " .. shell .. " -n")
+			local _, err, code = run("${LUA:-lua} bin/prettypath.lua completion " .. shell .. " | " .. shell .. " -n")
 			assert.are.equal("", err)
 			assert.are.equal(0, code)
 		end)
@@ -344,7 +344,7 @@ describe("--line-buffered", function()
 	-- ms from start until the first output line, with the second input line 1s behind the first
 	local function first_line_ms(args)
 		local script = "s=$(date +%s%N); (echo /etc/hosts; sleep 1; echo /etc/passwd)"
-			.. " | env -u NO_COLOR lua bin/prettypath.lua "
+			.. " | env -u NO_COLOR ${LUA:-lua} bin/prettypath.lua "
 			.. args
 			.. " --format=%name% | { IFS= read -r l; e=$(date +%s%N); cat > /dev/null; echo $(((e - s) / 1000000)); }"
 		local out = run("bash -c " .. sh_quote(script))
@@ -367,7 +367,7 @@ describe("--output_stats", function()
 	end)
 
 	it("prints - instead of nan on empty input", function()
-		local out, err, code = run("printf '' | env -u NO_COLOR lua bin/prettypath.lua --output_stats")
+		local out, err, code = run("printf '' | env -u NO_COLOR ${LUA:-lua} bin/prettypath.lua --output_stats")
 		assert.are.equal("", out)
 		assert.are.equal(0, code)
 		assert.is_falsy(err:match("nan"))

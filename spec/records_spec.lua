@@ -13,8 +13,9 @@ local function cli(args, input)
 	local f = io.open(inp, "wb")
 	f:write(input or "")
 	f:close()
-	local r1, _, r3 =
-		os.execute("env -u NO_COLOR lua bin/prettypath.lua " .. args .. " < " .. inp .. " > " .. out .. " 2> " .. err)
+	local r1, _, r3 = os.execute(
+		"env -u NO_COLOR ${LUA:-lua} bin/prettypath.lua " .. args .. " < " .. inp .. " > " .. out .. " 2> " .. err
+	)
 	local code = type(r1) == "number" and math.floor(r1 / 256) or r3
 	local o = io.open(out, "rb"):read("*a")
 	local e = io.open(err):read("*a")

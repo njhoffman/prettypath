@@ -2,6 +2,11 @@ local uv = require("luv") -- "luv" when stand-alone, "uv" in luvi apps
 local format = require("prettypath.format")
 local inspect = require("prettypath.inspect")
 
+-- opts.time_format (strftime) for %access%, %mod% and %create%; read per call, so a library caller can change it
+local function time_format()
+	return require("prettypath.opts").time_format
+end
+
 -- %token% -> function(pathinfo); built on first use (color requires opts, which requires this module)
 local token_formatters
 local function formatters()
@@ -26,25 +31,25 @@ local function formatters()
 			return color.name(p.name, p.missing)
 		end,
 		size = function(p)
-			return format.size(p.size)
+			return color.size(format.size(p.size))
 		end,
 		access = function(p)
-			return format.time(p.atime)
+			return color.date(format.time(p.atime, false, time_format()))
 		end,
 		mod = function(p)
-			return format.time(p.mtime)
+			return color.date(format.time(p.mtime, false, time_format()))
 		end,
 		create = function(p)
-			return format.time(p.ctime)
+			return color.date(format.time(p.ctime, false, time_format()))
 		end,
 		access_ago = function(p)
-			return format.time(p.atime, true)
+			return color.date(format.time(p.atime, true))
 		end,
 		mod_ago = function(p)
-			return format.time(p.mtime, true)
+			return color.date(format.time(p.mtime, true))
 		end,
 		create_ago = function(p)
-			return format.time(p.ctime, true)
+			return color.date(format.time(p.ctime, true))
 		end,
 	}
 	return token_formatters
@@ -52,12 +57,16 @@ end
 
 local M = {}
 
+-- M.file_stat(path): mtime, ctime, atime, size and type, or nil and true for a broken symlink (nil and
+-- false for a path that does not exist)
 M.file_stat = function(path)
 	-- luarocks install luv
 	local stat = uv.fs_stat(path)
 
 	if stat == nil then
-		return stat
+		-- a symlink whose target is gone: fs_stat follows it and fails, fs_lstat sees the link itself
+		local link = uv.fs_lstat(path)
+		return nil, link ~= nil and link.type == "link"
 	end
 	return {
 		mtime = stat.mtime.sec,

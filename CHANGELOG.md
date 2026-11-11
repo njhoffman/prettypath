@@ -6,6 +6,25 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-11-10
+
+### Added
+- `--time_format=FORMAT` sets the strftime format of `%access%`, `%mod%` and `%create%` (default `%x %X`, as
+  before); an empty one fails up front.
+- With a stat, a symlink whose target is gone gets a broken-link icon (dimmed like a missing path) instead of
+  looking like any missing file.
+- `make test-luajit` runs the suite, the CLI it starts included, under luajit; the specs take the interpreter
+  from `LUA`.
+- CI: lint, the format check and the suite under lua 5.1 and luajit on every push and pull request.
+
+### Changed
+- `%size%` and the date tokens are colored with `colors.size` and `colors.date` from opts.lua (they printed
+  plain; the options were unused), and the `-` for one without data is dimmed. `--color=never` and `256`
+  apply as to the rest.
+- bin/filetype-generator.sh reads the icon names from a clone of the current nvim-tree/nvim-web-devicons in
+  a headless nvim (`NVIM`, `DEVICONS_REPO`); it fetched one file of the old repo, which the plugin has since
+  split into modules, and ran a fixed /usr/bin/nvim.
+
 ## [0.7.2] - 2026-11-10
 
 ### Fixed

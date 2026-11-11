@@ -26,24 +26,25 @@ Reviewed: 2026-11-10
       ("12 lib/x.lua", score 0); the score pattern in parse_path requires an absolute path after it. Accept
       any path after the number, or document %score% as absolute-only. With `--field`, the score column
       is not visible to %score% at all; a `--score_field=N` would cover ranked tabbed input.
-- [ ] **opts.colors.date and opts.colors.size are unused** (p3) [refactor]: opts.lua defines colors for the
+- [x] **opts.colors.date and opts.colors.size are unused** (p3) [refactor]: opts.lua defines colors for the
       date and size tokens, but format.lua prints them plain. Color them (through color.lua, so
       --color=never and 256 apply) or drop the two options.
 - [ ] **filetype-generator.sh fetches from the old devicons URL** (p3) [chore]: bin/filetype-generator.sh
-      curls raw.githubusercontent.com/kyazdani42/nvim-web-devicons, which moved to nvim-tree/nvim-web-devicons
-      (and split its icon tables into separate files since). Update the URL and check it still builds
-      iconmap.lua before the next icon refresh.
-- [ ] **CLI specs only run under lua 5.1** (p3) [test]: the specs that spawn the CLI call `lua
+      curled one file of the old kyazdani42/nvim-web-devicons, which now keeps its tables in several modules,
+      and ran /usr/bin/nvim. Updated 2026-11-10: it clones nvim-tree/nvim-web-devicons (DEVICONS_REPO), reads
+      the icon names in a headless nvim (NVIM) and fetches 732 names. Left: a full run (one nvim per name,
+      a few minutes) to compare its filetypes table with iconmap.lua's before the next icon refresh.
+- [x] **CLI specs only run under lua 5.1** (p3) [test]: the specs that spawn the CLI call `lua
       bin/prettypath.lua`, so `busted --lua=luajit` runs only the library specs under luajit, while the
       installed launcher runs the CLI under luajit. Take the interpreter from an env var (LUA, as bench.sh
       does) and add `make test-luajit`.
 - [ ] **No CI** (p3) [chore]: nothing runs `make check test` on a push. A GitHub Actions workflow with lua 5.1
       and luajit (luarocks install luv lua-filesize busted luacheck, stylua from its release) would catch a
       broken push the way the local suite does.
-- [ ] **Time format is fixed** (p3) [feature]: `%mod%` and friends print `os.date("%x %X")`, locale-dependent
+- [x] **Time format is fixed** (p3) [feature]: `%mod%` and friends print `os.date("%x %X")`, locale-dependent
       and not configurable. A `--time_format=STRFTIME` option (default unchanged) would let callers line
       up columns or use ISO dates.
-- [ ] **Broken symlinks look like missing files** (p3) [feature]: with a stat, a symlink whose target is gone
+- [x] **Broken symlinks look like missing files** (p3) [feature]: with a stat, a symlink whose target is gone
       fails fs_stat and is dimmed as missing, same as a path that does not exist. fs_lstat on failure would
       tell them apart (a broken-link icon or color), for listings like `find -L`.
 

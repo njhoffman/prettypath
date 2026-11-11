@@ -1,0 +1,49 @@
+# lint, format check and the busted suite on every push and pull request, under lua 5.1 and luajit
+# (the interpreters `make install` picks between). zsh and fish are installed so the completion specs run.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: test (${{ matrix.lua }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - lua: "5.1"
+            bin: lua
+          - lua: luajit-2.1
+            bin: luajit
+    steps:
+      - uses: actions/checkout@v4
+      - uses: leafo/gh-actions-lua@v10
+        with:
+          luaVersion: ${{ matrix.lua }}
+      - uses: leafo/gh-actions-luarocks@v4
+      - name: shells for the completion specs
+        run: sudo apt-get update && sudo apt-get install -y zsh fish
+      - name: dependencies
+        run: |
+          luarocks install luv
+          luarocks install lua-filesize
+          luarocks install busted
+          luarocks install luacheck
+      - name: lint
+        run: make lint
+      - name: test
+        # the specs start the CLI with $LUA; the luarocks tree is the action's, already on the paths
+        run: LUA=${{ matrix.bin }} make test LUAROCKS=luarocks
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: JohnnyMorganz/stylua-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          version: 2.6.0
+          args: --respect-ignores --check bin prettypath.lua prettypath spec

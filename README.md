@@ -47,6 +47,7 @@ prettypath completion bash|zsh|fish
 | `--field=N` | Decorate only field N of each line (1 is the first, -1 the last) and pass the other fields through; a line without field N is printed unchanged |
 | `--delimiter=D` | Field separator for `--field`, taken literally (default tab; `\t` works as typed) |
 | `--line-buffered` | Flush after every record, so a consumer on a slow source shows rows as they come |
+| `--time_format=FORMAT` | strftime format for `%access%`, `%mod%` and `%create%` (default `%x %X`, the locale's date and time; `%F %R` gives `2026-11-10 17:45`) |
 | `-0`, `--null` | Records are separated by NUL, in and out (`fd -0`, `find -print0`, `fzf --read0`) |
 | `--color=MODE` | `always` (the default), `never`, `auto` (only when stdout is a terminal) or `256` (xterm-256 colors for terminals without truecolor). `NO_COLOR` makes the default `never`; an explicit `--color` wins. Icons are printed either way |
 
@@ -63,12 +64,13 @@ invalid value exits with status 2 and a message before any input is read.
 | `%dir%` | The directory part, colored; under `$HOME` it starts with `~` (`$HOME` itself shows as `~`), under `--base` it is relative |
 | `%name%` | The file name, colored |
 | `%score%` | A score read from the start of the line, for ranked lists: before an absolute path always (`12.5 /path`), before a relative one when the format shows `%score%` (`3 src/a.lua`) |
-| `%size%` | File size, human-readable |
-| `%access%`, `%mod%`, `%create%` | Access, modification and change times |
+| `%size%` | File size, human-readable, in `colors.size` |
+| `%access%`, `%mod%`, `%create%` | Access, modification and change times (`--time_format`), in `colors.date` |
 | `%access_ago%`, `%mod_ago%`, `%create_ago%` | The same times, relative (`3h ago`) |
 
 Only `%name%`-shaped tokens are read; other text, `%` included, is printed as is. The size and date tokens
-print `-` for a missing file or with `--stat_file=false`. A trailing `/` marks a directory, and an empty line
+print a dimmed `-` for a missing file or with `--stat_file=false`. With a stat, a symlink whose target is
+gone gets a broken-link icon. A trailing `/` marks a directory, and an empty line
 stays empty.
 
 ### Examples
@@ -134,11 +136,14 @@ feature; [CHANGELOG.md](CHANGELOG.md) lists what each version added.
 
 ```sh
 make test          # busted specs (loads the luarocks paths itself)
+make test-luajit   # the same under luajit, the CLI included
 make lint          # luacheck
 make format        # stylua (the icon data files are in .styluaignore)
 make bench         # startup and µs per path; LUA=luajit to compare
 make icon-report   # icon coverage over DIRS
 ```
+
+CI (.github/workflows/ci.yml) runs lint, the format check and the suite under lua 5.1 and luajit on every push.
 
 ## License
 

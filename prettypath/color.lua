@@ -122,9 +122,28 @@ local color_score = function(score)
 	return score
 end
 
+-- a size or a date token's text in opts.colors.size / opts.colors.date; the "-" printed for one without
+-- data (a missing file, no stat) in the missing color
+local function color_meta(text, color)
+	if text == "-" then
+		return to_ansi(text, opts.colors.missing)
+	end
+	return to_ansi(text, color)
+end
+
+local color_size = function(text)
+	return color_meta(text, opts.colors.size)
+end
+
+local color_date = function(text)
+	return color_meta(text, opts.colors.date)
+end
+
 return {
 	xterm256 = xterm256,
 	score = color_score,
+	size = color_size,
+	date = color_date,
 	dir = color_dir,
 	name = color_name,
 	icon = color_icon,

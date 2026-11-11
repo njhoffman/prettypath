@@ -41,6 +41,8 @@ local opts = {
   line_buffered = false,
   -- records separated by NUL instead of newline, in and out
   null         = false,
+  -- os.date (strftime) format for %access%, %mod% and %create%
+  time_format  = "%x %X",
 }
 
 local no_color = os.getenv("NO_COLOR")
@@ -159,6 +161,13 @@ local function apply_args(argv)
 			opts.line_buffered = parse_bool(val, name)
 		elseif key == "null" then
 			opts.null = parse_bool(val, name)
+		elseif key == "time_format" then
+			-- os.date rejects some conversions (5.2+, luajit); fail up front, not on the first file
+			local ok = val ~= "" and pcall(os.date, val, 0)
+			if not ok then
+				error("--time_format takes an os.date (strftime) format, not '" .. val .. "'", 0)
+			end
+			opts.time_format = val
 		end
 	end
 	return opts

@@ -2,7 +2,7 @@ LUAROCKS ?= luarocks --local
 DEV_ROCKSPEC = prettypath-dev-4.rockspec
 LUA_SOURCES = bin/*.lua prettypath.lua prettypath/*.lua spec/*.lua
 
-.PHONY: all install rock lint check format format-check test test-unit test-watch test-verbose test-coverage \
+.PHONY: all install rock lint check format format-check test test-luajit test-unit test-watch test-verbose test-coverage \
 	bench icon-report clean
 
 all: lint test
@@ -49,6 +49,11 @@ test-watch:
 
 test-verbose:
 	$(LUAROCKS_ENV) busted --verbose
+
+# the whole suite under luajit: the library specs (busted --lua) and the CLI they start (LUA, read by the
+# specs that run bin/prettypath.lua), as the make install launcher runs it
+test-luajit:
+	$(LUAROCKS_ENV) LUA=luajit busted --lua=luajit
 
 test-coverage:
 	$(LUAROCKS_ENV) busted --coverage && luacov

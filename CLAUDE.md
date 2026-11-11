@@ -101,7 +101,7 @@ after the generated `icons`, so they win), and a type that should reuse an exist
 Tests use busted framework. Test files are in `spec/` directory.
 
 ```bash
-# Run all tests
+# Run all tests (make test-luajit: the same under luajit, the CLI included)
 make test
 
 # Run tests with verbose output

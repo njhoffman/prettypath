@@ -4,29 +4,44 @@
 
 set -euo pipefail
 
+# Prints the `filetypes` table for prettypath/iconmap.lua (vim filetype -> the icon names that map to it)
+# and the icon names vim gives no filetype, from the current nvim-web-devicons. The output is for review:
+# paste the tables into iconmap.lua by hand. NVIM=path, DEVICONS_REPO=url (default nvim-tree's).
+NVIM="${NVIM:-$(command -v nvim)}"
+DEVICONS_REPO="${DEVICONS_REPO:-https://github.com/nvim-tree/nvim-web-devicons}"
+
+# get_icon_names DIR: every icon name (file names and extensions) nvim-web-devicons defines, sorted. The
+# plugin keeps its tables in several modules (lua/nvim-web-devicons/default/*) and expects vim, so it is
+# cloned into DIR and asked for its icons inside a headless nvim.
 function get_icon_names() {
-  curl 'https://raw.githubusercontent.com/kyazdani42/nvim-web-devicons/master/lua/nvim-web-devicons.lua' |
-    lua -e '
-      pats={}
-      for name in pairs(dofile().get_icons()) do
-        table.insert(pats, name)
+  git clone --quiet --depth 1 "$DEVICONS_REPO" "$1/devicons"
+  "$NVIM" --headless -u NONE --noplugin --cmd "set rtp+=$1/devicons" +'lua
+    local names = {}
+    -- string keys only: get_icons() also holds a few numbered entries, not names
+    for name in pairs(require("nvim-web-devicons").get_icons()) do
+      if type(name) == "string" then
+        names[#names + 1] = name
       end
-      table.sort(pats)
-      print(table.concat(pats, "\n"))
-    '
+    end
+    table.sort(names)
+    vim.fn.writefile(names, "/dev/stdout")
+  ' +qa
 }
 
 function main() {
-  local tmp
+  local tmp names
   tmp="$(mktemp -d)"
   # shellcheck disable=2064
-  trap "rmdir '$tmp'" EXIT
-  cd "$tmp"
+  trap "rm -rf -- '$tmp'" EXIT
+  [[ -x "$NVIM" ]] || { echo "filetype-generator: no nvim (set NVIM)" >&2; exit 1; }
+  names="$(get_icon_names "$tmp")"
+  [[ -n "$names" ]] || { echo "filetype-generator: no icon names from $DEVICONS_REPO" >&2; exit 1; }
+  mkdir "$tmp/files"
+  cd "$tmp/files"
   local file
   local -A filetypes=()
   local -a missing=()
   while read -r pat; do
-    echo "$pat" >&2
     if [[ "$pat" =~ ^\. ]]; then
       file="$pat"
     else
@@ -34,7 +49,7 @@ function main() {
     fi
     touch "./$file"
     local ft
-    ft="$(/usr/bin/nvim -u NORC --noplugin --headless "./$file" +'lua
+    ft="$("$NVIM" -u NORC --noplugin --headless "./$file" +'lua
       local ok, err = pcall(vim.fn.writefile, { vim.bo.filetype }, "/dev/stdout")
       if not ok then
         print(err .. "\n")
@@ -52,7 +67,7 @@ function main() {
     else
       missing+=("$pat")
     fi
-  done < <(get_icon_names)
+  done <<< "$names"
 
   echo "local filetypes = {"
   for ft in "${!filetypes[@]}"; do

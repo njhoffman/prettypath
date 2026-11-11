@@ -8,24 +8,22 @@ on:
 
 jobs:
   test:
-    name: test (${{ matrix.lua }})
+    name: ${{ matrix.target }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - lua: "5.1"
-            bin: lua
-          - lua: luajit-openresty
-            bin: luajit
+        # luajit runs on the lua 5.1 tree, as on a machine with `make install`: luarocks itself cannot run
+        # under luajit (the luarocks.org manifest is over luajit's 65536 constants per function)
+        target: [test, test-luajit]
     steps:
       - uses: actions/checkout@v4
       - uses: leafo/gh-actions-lua@v10
         with:
-          luaVersion: ${{ matrix.lua }}
+          luaVersion: "5.1"
       - uses: leafo/gh-actions-luarocks@v4
-      - name: shells for the completion specs
-        run: sudo apt-get update && sudo apt-get install -y zsh fish
+      - name: luajit, and shells for the completion specs
+        run: sudo apt-get update && sudo apt-get install -y luajit zsh fish
       - name: dependencies
         run: |
           luarocks install luv
@@ -34,9 +32,9 @@ jobs:
           luarocks install luacheck
       - name: lint
         run: make lint
-      - name: test
-        # the specs start the CLI with $LUA; the luarocks tree is the action's, already on the paths
-        run: LUA=${{ matrix.bin }} make test LUAROCKS=luarocks
+      - name: ${{ matrix.target }}
+        # the specs start the CLI with $LUA (test-luajit sets it); the luarocks tree is the action's
+        run: make ${{ matrix.target }} LUAROCKS=luarocks
 
   format:
     runs-on: ubuntu-latest

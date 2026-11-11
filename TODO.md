@@ -36,7 +36,7 @@ Reviewed: 2026-11-10
       a few minutes) to compare its filetypes table with iconmap.lua's before the next icon refresh. Done
       2026-11-10: the full run works (170 filetypes; detection now `-u NONE` + `filetype on`, since
       `-u NORC` ran ftplugins and the user's after/ftplugin); the comparison is the next item.
-- [ ] **iconmap.lua's filetypes table is stale and partly wrong** (p3) [bug]: it backs only the library's
+- [x] **iconmap.lua's filetypes table is stale and partly wrong** (p3) [bug]: it backs only the library's
       `devicons.get_by_filetype(ft)` (the CLI never reads it). Against bin/filetype-generator.sh's output
       (2026-11-10, current nvim-web-devicons): 85 of its 160 entries agree, 2 map to the wrong icon (`fortran`
       to "f#", the F# icon; `cobol` to a name the generator lists as cbl/cob/cpy), 73 keys are not vim

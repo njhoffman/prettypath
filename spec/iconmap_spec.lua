@@ -109,5 +109,28 @@ describe("iconmap", function()
 				assert.equals(ext, iconmap.filetypes[ft], "Incorrect mapping for filetype: " .. ft)
 			end
 		end)
+
+		-- rebuilt 2026-11-10 from bin/filetype-generator.sh (vim filetypes from the current nvim-web-devicons)
+		it("maps every filetype to a name that has an icon", function()
+			require("prettypath") -- the overrides apply
+			local devicons = require("prettypath.devicons")
+			for ft in pairs(iconmap.filetypes) do
+				assert.are_not.equal("Default", devicons.get_by_filetype(ft).name, ft)
+			end
+		end)
+
+		it("maps filetypes the old table had wrong or lacked", function()
+			assert.equals("makefile", iconmap.filetypes["make"])
+			assert.equals(".gitignore", iconmap.filetypes["gitignore"])
+			assert.equals("typ", iconmap.filetypes["typst"])
+			-- fortran pointed at the F# icon; the generator offers no fortran icon, so there is none
+			assert.are_not.equal("f#", iconmap.filetypes["fortran"])
+		end)
+
+		it("has no keys that are not vim filetypes", function()
+			for _, key in ipairs({ "png", "jpg", "Brewfile", "LICENSE", "Gemfile", "javascript.jsx", "lock" }) do
+				assert.is_nil(iconmap.filetypes[key], key)
+			end
+		end)
 	end)
 end)

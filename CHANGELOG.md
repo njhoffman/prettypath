@@ -6,6 +6,17 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.8.1] - 2026-11-10
+
+### Fixed
+- `devicons.get_by_filetype(ft)` (library only; the CLI does not use it) works from a filetypes table rebuilt
+  with bin/filetype-generator.sh against the current nvim-web-devicons: 118 vim filetypes, each mapped to a
+  name that has an icon. It gains `gitignore`, `typst`, `po`, `env` and 24 others; `fortran` no longer
+  gets the F# icon; and 69 keys that were not vim filetypes (`png`, `jpg`, `Brewfile`, `LICENSE`, ...)
+  are gone.
+- bin/filetype-generator.sh detects filetypes without running filetype plugins or the user's nvim config,
+  which printed errors and slowed every run.
+
 ## [0.8.0] - 2026-11-10
 
 ### Added

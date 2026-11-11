@@ -38,7 +38,7 @@ Reviewed: 2026-11-10
       bin/prettypath.lua`, so `busted --lua=luajit` runs only the library specs under luajit, while the
       installed launcher runs the CLI under luajit. Take the interpreter from an env var (LUA, as bench.sh
       does) and add `make test-luajit`.
-- [ ] **No CI** (p3) [chore]: nothing runs `make check test` on a push. A GitHub Actions workflow with lua 5.1
+- [x] **No CI** (p3) [chore]: nothing runs `make check test` on a push. A GitHub Actions workflow with lua 5.1
       and luajit (luarocks install luv lua-filesize busted luacheck, stylua from its release) would catch a
       broken push the way the local suite does.
 - [x] **Time format is fixed** (p3) [feature]: `%mod%` and friends print `os.date("%x %X")`, locale-dependent

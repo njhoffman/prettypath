@@ -2044,3 +2044,9 @@ local filetypes =
     ['http'] = 'http',
     ['cake'] = 'cake',
   }
+
+-- an alternative icon set (material icons), not loaded by default; same shape as override.lua
+return {
+  icons = icons,
+  filetypes = filetypes,
+}

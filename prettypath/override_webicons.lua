@@ -1519,3 +1519,8 @@ local overrides =
       name = 'Zip',
     },
   }
+
+-- an alternative icon set (nvim-web-devicons overrides), not loaded by default; same shape as override.lua
+return {
+  icons = overrides,
+}

@@ -1330,5 +1330,4 @@ local filetypes = {
 return {
   filetypes      = filetypes,
   icons          = icons,
-  directory_icon = directory_icon
 }

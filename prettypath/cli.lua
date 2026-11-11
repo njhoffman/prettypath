@@ -17,7 +17,7 @@ M.options = {
 		"true (always; also dims missing files) or false (default: auto)",
 	} },
 	{ name = "output_stats", arg = "BOOL", values = { "true", "false" },
-		desc = { "Print statistics after processing (default: false)" } },
+		desc = { "Print statistics to stderr when done (default: false)" } },
 	{ name = "base", arg = "DIR", complete = "dir", desc = {
 		"Show directories under DIR relative to it in %dir%",
 		"(%path% is unchanged)",

@@ -6,6 +6,34 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-10
+
+### Added
+- README.md: install, options, format tokens, examples, shell completion, icon customization, the library API
+  and the `--version` contract; a spec keeps it in step with the options and tokens.
+- `make icon-report DIRS="..."` prints icon coverage over real listings and the most common types without
+  an icon (`TOP=` sets how many).
+- `make` alone runs lint and the tests; `make check` adds the format check.
+
+### Changed
+- `--output_stats` in `--help` says the report goes to stderr.
+- `make format` and `make format-check` leave the generated icon data alone (`.styluaignore`), and the four
+  code files that were not stylua-formatted are now.
+- `make lint` also covers prettypath.lua and every script in bin/, and passes with no warnings.
+- override_materialicons.lua and override_webicons.lua return their icon tables (as override.lua does), so
+  either can be loaded as an alternative set; they are still not loaded by default.
+
+### Fixed
+- The `Gemfile` entries in override.lua apply (their keys ended in a literal `$`, which no name matches).
+
+### Removed
+- `prettypath_test` is no longer installed as a command (the script stays in bin/ for development), and the
+  rockspec no longer installs the bin scripts as Lua modules. Reinstalling removes the old `prettypath_test`.
+- install.sh (built a rockspec that no longer exists; `make install` replaces it, `make icon-report` its
+  stats runs), the empty prettypath/test.lua, and the Makefile's leftover targets from another project
+  (docs, man pages, website, standalone, coverage).
+- nonicons.lua's unused codepoint table and generator, and iconmap.lua's undefined `directory_icon`.
+
 ## [0.6.0] - 2026-11-10
 
 ### Added

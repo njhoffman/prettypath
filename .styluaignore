@@ -1,0 +1,8 @@
+# generated or vendored icon data and inspect.lua: thousands of lines a format run should not touch
+prettypath/iconmap.lua
+prettypath/override.lua
+prettypath/override_materialicons.lua
+prettypath/override_nonicons.lua
+prettypath/override_webicons.lua
+prettypath/nonicons.lua
+prettypath/inspect.lua

@@ -245,13 +245,18 @@ describe("library use", function()
 end)
 
 describe("rockspec", function()
+	it("installs only the CLI as a command, and no scripts as modules", function()
+		local spec = io.open("prettypath-dev-4.rockspec"):read("*a")
+		assert.is_falsy(spec:find('["bin.', 1, true))
+		assert.is_falsy(spec:find("prettypath_test", 1, true))
+		assert.is_truthy(spec:find('["prettypath"] = "bin/prettypath.lua"', 1, true))
+	end)
+
 	it("installs every module in prettypath/", function()
 		local spec = io.open("prettypath-dev-4.rockspec"):read("*a")
 		for file in io.popen("ls prettypath/*.lua"):lines() do
 			local mod = file:match("^prettypath/(.+)%.lua$")
-			if mod ~= "test" then
-				assert.is_truthy(spec:find('["prettypath.' .. mod .. '"]', 1, true), mod .. " missing from rockspec")
-			end
+			assert.is_truthy(spec:find('["prettypath.' .. mod .. '"]', 1, true), mod .. " missing from rockspec")
 		end
 	end)
 end)

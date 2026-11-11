@@ -30,11 +30,8 @@ build = {
 	install = {
 		bin = {
 			["prettypath"] = "bin/prettypath.lua",
-			["prettypath_test"] = "bin/prettypath_test.lua",
 		},
 		lua = {
-			["bin.prettypath"] = "bin/prettypath.lua",
-			["bin.prettypath_test"] = "bin/prettypath_test.lua",
 			["prettypath"] = "prettypath.lua",
 			["prettypath.cli"] = "prettypath/cli.lua",
 			["prettypath.color"] = "prettypath/color.lua",

@@ -13,7 +13,26 @@ never loaded) and luv adds nothing measurable, so lazy loading the icon tables w
 
 Reviewed: 2026-11-10
 
-## 1. Speed
+## 4. Tooling and docs
+
+- [x] **Tests need luarocks paths in the environment** (p3) [test]: `make test` fails with "module 'luv'
+      not found" unless the shell has `eval "$(luarocks --local path)"`; busted and the CLI specs run plain
+      `lua`. Have the Makefile test targets set LUA_PATH/LUA_CPATH from `luarocks path`.
+- [x] **Makefile is mostly dead lunamark targets** (p3) [chore]: ROCKSPEC/rockspec.in/REVISION, bench (Markdown
+      test files that do not exist), prof, coverage (bin/shtest), docs, website, standalone and the
+      install target do not apply to this project. Remove them; the Benchmark target item replaces bench.
+- [x] **install.sh is stale** (p3) [chore]: it builds prettypath-dev-2.rockspec and reads files.txt,
+      both gone. Update it to the current rockspec or delete it in favor of `make rock`.
+- [x] **Rockspec installs scripts as modules** (p3) [chore]: build.install.lua maps `bin.prettypath` and
+      `bin.prettypath_test` as Lua modules, and installs prettypath_test as a user-facing binary.
+- [x] **No README** (p3) [docs]: the only usage docs are CLAUDE.md and --help; the rockspec homepage points
+      at a repo with no README. Add one with install, options, tokens and icon overrides.
+- [ ] **No LICENSE file** (p3) [docs]: the rockspec and README say MIT, but the repo has no LICENSE, which
+      the MIT terms expect alongside the code. Add one with the copyright holder and year.
+
+## Completed
+
+### 1. Speed (completed 2026-11-10)
 
 - [x] **Stat only when the format needs it** (p1) [perf]: `--stat_file` defaults to true and triples the
       per-path cost, but only `%size%`, `%mod%`, `%access%`, `%create%` and their `_ago` forms read the stat.
@@ -39,7 +58,7 @@ Reviewed: 2026-11-10
       `--line-buffered` flag for interactive consumers that want the first rows at once (fzf shows the first
       screen sooner on a slow source).
 
-## 2. Interface for callers
+### 2. Interface for callers (completed 2026-11-10)
 
 - [x] **--base DIR** (p2) [feature]: drop a directory prefix from `%dir%` (shown relative to the base, as
       `fd` and `rg` print). fzx strips `~/base/` from every display line with awk after prettypath.
@@ -69,7 +88,7 @@ Reviewed: 2026-11-10
       completion function; zsh's `_arguments` behavior is untested and fish is not installed here. Add a
       zpty-driven zsh check and a `fish --no-execute` one where fish exists.
 
-## 3. Correctness and packaging
+### 3. Correctness and packaging (completed 2026-11-10)
 
 - [x] **Library use parses the host's arg** (p2) [bug]: `require("prettypath")` from other Lua code (an
       nvim plugin) reads the host program's `arg` as prettypath options. Parse arguments only in
@@ -101,27 +120,12 @@ Reviewed: 2026-11-10
       override.lua's icons table (mp3, wav, `Gemfile$`, zip, tar) are defined again further down the same
       table literal, and the later entry wins (luacheck W314), so the custom icons and colors never apply.
       Keep one entry per key: move the custom ones after the generated block, or into their own table merged last.
-- [ ] **make format rewrites the icon data files** (p3) [chore]: `make format` (stylua on prettypath/*.lua)
+- [x] **make format rewrites the icon data files** (p3) [chore]: `make format` (stylua on prettypath/*.lua)
       reformats iconmap.lua, override*.lua, nonicons.lua and inspect.lua, thousands of lines of generated or
       vendored data. Add a .styluaignore for them (or narrow the Makefile globs) so a format run touches code only.
-- [ ] **Icon data modules: dead code and missing returns** (p3) [chore]: iconmap.lua exports
+- [x] **Icon data modules: dead code and missing returns** (p3) [chore]: iconmap.lua exports
       `directory_icon`, which is never defined (nil); override_materialicons.lua and override_webicons.lua
       build their tables but return nothing, so `require` gives `true`; nonicons.lua has an unused
       generate_icons with unreachable code. Return the tables (or drop the modules) so luacheck is clean.
       Also override.lua's `Gemfile$` keys (custom and generated): icon lookup is by exact name, so a key
       with a literal "$" never matches `Gemfile`.
-
-## 4. Tooling and docs
-
-- [x] **Tests need luarocks paths in the environment** (p3) [test]: `make test` fails with "module 'luv'
-      not found" unless the shell has `eval "$(luarocks --local path)"`; busted and the CLI specs run plain
-      `lua`. Have the Makefile test targets set LUA_PATH/LUA_CPATH from `luarocks path`.
-- [ ] **Makefile is mostly dead lunamark targets** (p3) [chore]: ROCKSPEC/rockspec.in/REVISION, bench (Markdown
-      test files that do not exist), prof, coverage (bin/shtest), docs, website, standalone and the
-      install target do not apply to this project. Remove them; the Benchmark target item replaces bench.
-- [ ] **install.sh is stale** (p3) [chore]: it builds prettypath-dev-2.rockspec and reads files.txt,
-      both gone. Update it to the current rockspec or delete it in favor of `make rock`.
-- [ ] **Rockspec installs scripts as modules** (p3) [chore]: build.install.lua maps `bin.prettypath` and
-      `bin.prettypath_test` as Lua modules, and installs prettypath_test as a user-facing binary.
-- [ ] **No README** (p3) [docs]: the only usage docs are CLAUDE.md and --help; the rockspec homepage points
-      at a repo with no README. Add one with install, options, tokens and icon overrides.

@@ -1,41 +1,42 @@
-VERSION=dev-4
-REVISION=3
-ROCKSPEC=prettypath-$(VERSION)-$(REVISION).rockspec
-date=$(shell date +%x)
-luas=prettypath.lua prettypath/*.lua prettypath/*/*.lua
-web=website
-templatesdir=templates
-NUM ?= 25
-PROG ?= bin/prettypath
-TESTOPTS ?= --tidy
+LUAROCKS ?= luarocks --local
+DEV_ROCKSPEC = prettypath-dev-4.rockspec
+LUA_SOURCES = bin/*.lua prettypath.lua prettypath/*.lua spec/*.lua
 
+.PHONY: all install rock lint check format format-check test test-unit test-watch test-verbose test-coverage \
+	bench icon-report clean
 
-all: build
+all: lint test
 
-build: $(ROCKSPEC)
-	luarocks make $(ROCKSPEC)
+# luarocks install, then the launcher over its wrapper (luajit when installed, no luarocks.loader at startup);
+# LUAROCKS="luarocks" for a system-wide tree
+install:
+	$(LUAROCKS) make $(DEV_ROCKSPEC)
+	bash scripts/install-launcher.sh \
+		"$$($(LUAROCKS) config deploy_bin_dir)/prettypath" \
+		"$$($(LUAROCKS) config deploy_lua_dir)" \
+		"$$($(LUAROCKS) config deploy_lib_dir)" \
+		"$$($(LUAROCKS) show --rock-dir prettypath)/bin/prettypath" \
+		"$$($(LUAROCKS) config variables.LUA)"
 
-.PHONY: build test test-unit test-watch test-verbose test-coverage check lint format rock bench docs clean run-code-examples install website standalone
+# plain luarocks install: keeps the luarocks wrapper (lua5.1, slower startup)
+rock:
+	$(LUAROCKS) make $(DEV_ROCKSPEC)
 
-rock: $(ROCKSPEC)
-	luarocks --local make $(ROCKSPEC)
-
-# Linting and formatting
-check: lint
-	@echo "Lint passed"
-
+# Linting and formatting (.styluaignore keeps the generated icon data out of format runs)
 lint:
-	luacheck bin/prettypath.lua prettypath/*.lua spec/*.lua
+	luacheck $(LUA_SOURCES)
+
+check: lint format-check
 
 format:
-	stylua bin/*.lua prettypath/*.lua spec/*.lua
+	stylua --respect-ignores $(LUA_SOURCES)
 
 format-check:
-	stylua --check bin/*.lua prettypath/*.lua spec/*.lua
+	stylua --respect-ignores --check $(LUA_SOURCES)
 
 # Testing. The specs (and the CLI they run) load luv and lua-filesize from the user's luarocks tree:
 # put its paths in the environment first, so a plain shell needs no `eval "$(luarocks path)"`.
-LUAROCKS_ENV = eval "$$(luarocks --local path 2> /dev/null)" && export LUA_PATH LUA_CPATH &&
+LUAROCKS_ENV = eval "$$($(LUAROCKS) path 2> /dev/null)" && export LUA_PATH LUA_CPATH &&
 
 test:
 	$(LUAROCKS_ENV) busted
@@ -52,57 +53,13 @@ test-verbose:
 test-coverage:
 	$(LUAROCKS_ENV) busted --coverage && luacov
 
-$(ROCKSPEC): rockspec.in
-	sed -e "s/_VERSION/$(VERSION)/g; s/_REVISION/$(REVISION)/g" $< > $@
-
 # startup and µs per path over a fixed generated list; LUA=luajit, PATHS=N, RUNS=N
 bench:
 	LUA="$(or $(LUA),lua)" bash bench/bench.sh
 
-coverage:
-	-rm luacov.stats.out ; \
-	prettypath_EXTENSIONS="" bin/shtest ${TESTOPTS} -p "lua -lluacov ${PROG}" ${OPTS} ; \
-	luacov
-
-%.1: bin/%
-	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/prettypath -Xdefinition_lists,-smart -t man -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
-
-%.1.html: bin/% ${templatesdir}/man.html
-	sed '1,/^@startman/d;/^@stopman/,$$d' $< | bin/prettypath -Xdefinition_lists,-smart -t html5 --template ${templatesdir}/man.html -s -d section=1,title=$(subst bin/,,$<),left_footer="${version}",date="${date}" -o $@
-
-docs: doc prettypath.1 lunadoc.1 prettypath.1.html lunadoc.1.html
-
-doc: ${luas} run-code-examples
-	mkdir -p doc
-	bin/lunadoc ${luas}
-
-run-code-examples: prettypath.lua
-	@echo Running code examples... ;\
-	grep -e '^--     ' $< | sed -e 's/^--     //' | lua
-
-# luarocks install, then the launcher over its wrapper (luajit when installed, no luarocks.loader at startup);
-# LUAROCKS="luarocks" for a system-wide tree
-LUAROCKS ?= luarocks --local
-DEV_ROCKSPEC = prettypath-dev-4.rockspec
-install:
-	$(LUAROCKS) make $(DEV_ROCKSPEC)
-	bash scripts/install-launcher.sh \
-		"$$($(LUAROCKS) config deploy_bin_dir)/prettypath" \
-		"$$($(LUAROCKS) config deploy_lua_dir)" \
-		"$$($(LUAROCKS) config deploy_lib_dir)" \
-		"$$($(LUAROCKS) show --rock-dir prettypath)/bin/prettypath" \
-		"$$($(LUAROCKS) config variables.LUA)"
-
-website: docs ${web}/index.html
-	rm -r ${web}/doc ${web}/*.1.html
-	cp -r doc prettypath.1.html lunadoc.1.html ${web}/
-
-${web}/index.html: README.markdown ${templatesdir}/web.html
-	bin/prettypath -Xdefinition_lists,smart --template ${templatesdir}/web.html -o $@ $<
-
-standalone: ${luas}
-	make -C standalone
+# icon coverage over real listings and the most common types without an icon; DIRS="~/ghq ~/.config", TOP=40
+icon-report:
+	$(LUAROCKS_ENV) bash scripts/icon-report.sh $(or $(DIRS),.)
 
 clean:
-	-rm -rf doc prettypath.1 lunadoc.1
-	make -C standalone clean
+	-rm -f luacov.stats.out luacov.report.out

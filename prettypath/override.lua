@@ -41,7 +41,7 @@ local custom =
       cterm_color = '188',
       name = 'Sql',
     },
-    ['Gemfile$'] = {
+    ['Gemfile'] = {
       icon = '',
       color = '#701516',
       name = 'Gemfile',
@@ -247,7 +247,7 @@ local icons =
       icon = '',
       name = 'License',
     },
-    ['Gemfile$'] = {
+    ['Gemfile'] = {
       color = '#701516',
       cterm_color = '1',
       icon = '',

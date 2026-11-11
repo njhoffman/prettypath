@@ -74,10 +74,7 @@ describe("iconmap", function()
 
 		it("colors are valid hex format", function()
 			for key, icon in pairs(iconmap.icons) do
-				assert.is_truthy(
-					icon.color:match("^#%x%x%x%x%x%x$"),
-					"Invalid color format for " .. key .. ": " .. icon.color
-				)
+				assert.is_truthy(icon.color:match("^#%x%x%x%x%x%x$"), "Invalid color format for " .. key .. ": " .. icon.color)
 			end
 		end)
 	end)

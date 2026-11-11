@@ -6,6 +6,11 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-11-10
+
+### Added
+- LICENSE (MIT), the terms the rockspec and README already named.
+
 ## [0.7.0] - 2026-11-10
 
 ### Added

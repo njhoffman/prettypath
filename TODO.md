@@ -13,23 +13,6 @@ never loaded) and luv adds nothing measurable, so lazy loading the icon tables w
 
 Reviewed: 2026-11-10
 
-## 4. Tooling and docs
-
-- [x] **Tests need luarocks paths in the environment** (p3) [test]: `make test` fails with "module 'luv'
-      not found" unless the shell has `eval "$(luarocks --local path)"`; busted and the CLI specs run plain
-      `lua`. Have the Makefile test targets set LUA_PATH/LUA_CPATH from `luarocks path`.
-- [x] **Makefile is mostly dead lunamark targets** (p3) [chore]: ROCKSPEC/rockspec.in/REVISION, bench (Markdown
-      test files that do not exist), prof, coverage (bin/shtest), docs, website, standalone and the
-      install target do not apply to this project. Remove them; the Benchmark target item replaces bench.
-- [x] **install.sh is stale** (p3) [chore]: it builds prettypath-dev-2.rockspec and reads files.txt,
-      both gone. Update it to the current rockspec or delete it in favor of `make rock`.
-- [x] **Rockspec installs scripts as modules** (p3) [chore]: build.install.lua maps `bin.prettypath` and
-      `bin.prettypath_test` as Lua modules, and installs prettypath_test as a user-facing binary.
-- [x] **No README** (p3) [docs]: the only usage docs are CLAUDE.md and --help; the rockspec homepage points
-      at a repo with no README. Add one with install, options, tokens and icon overrides.
-- [ ] **No LICENSE file** (p3) [docs]: the rockspec and README say MIT, but the repo has no LICENSE, which
-      the MIT terms expect alongside the code. Add one with the copyright holder and year.
-
 ## Completed
 
 ### 1. Speed (completed 2026-11-10)
@@ -129,3 +112,20 @@ Reviewed: 2026-11-10
       generate_icons with unreachable code. Return the tables (or drop the modules) so luacheck is clean.
       Also override.lua's `Gemfile$` keys (custom and generated): icon lookup is by exact name, so a key
       with a literal "$" never matches `Gemfile`.
+
+### 4. Tooling and docs (completed 2026-11-10)
+
+- [x] **Tests need luarocks paths in the environment** (p3) [test]: `make test` fails with "module 'luv'
+      not found" unless the shell has `eval "$(luarocks --local path)"`; busted and the CLI specs run plain
+      `lua`. Have the Makefile test targets set LUA_PATH/LUA_CPATH from `luarocks path`.
+- [x] **Makefile is mostly dead lunamark targets** (p3) [chore]: ROCKSPEC/rockspec.in/REVISION, bench (Markdown
+      test files that do not exist), prof, coverage (bin/shtest), docs, website, standalone and the
+      install target do not apply to this project. Remove them; the Benchmark target item replaces bench.
+- [x] **install.sh is stale** (p3) [chore]: it builds prettypath-dev-2.rockspec and reads files.txt,
+      both gone. Update it to the current rockspec or delete it in favor of `make rock`.
+- [x] **Rockspec installs scripts as modules** (p3) [chore]: build.install.lua maps `bin.prettypath` and
+      `bin.prettypath_test` as Lua modules, and installs prettypath_test as a user-facing binary.
+- [x] **No README** (p3) [docs]: the only usage docs are CLAUDE.md and --help; the rockspec homepage points
+      at a repo with no README. Add one with install, options, tokens and icon overrides.
+- [x] **No LICENSE file** (p3) [docs]: the rockspec and README say MIT, but the repo has no LICENSE, which
+      the MIT terms expect alongside the code. Add one with the copyright holder and year.

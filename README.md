@@ -141,4 +141,4 @@ make icon-report   # icon coverage over DIRS
 
 ## License
 
-MIT
+MIT, see [LICENSE](LICENSE).

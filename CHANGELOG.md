@@ -6,6 +6,13 @@ and were never tagged; their history is summarized at the end of 0.1.0.
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-14
+
+### Added
+- `just install` runs `make install` (the `luarocks --local` rock and its launcher), after checking
+  that luarocks is there; `just install-check` exits 1 when the launcher or the rock is missing.
+  `~/.shell`'s `deploy --with repos` runs them on each host.
+
 ## [0.8.1] - 2026-11-10
 
 ### Fixed
